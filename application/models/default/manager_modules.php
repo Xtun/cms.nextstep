@@ -10,10 +10,11 @@
  */
 
 class Manager_modules extends MY_Model {
-	protected $_table            = 'modules';
-    protected $_table_p            = 'pages';
-    protected $_table_mp        = 'module_pages';
-    protected $_table_settings    = 'settings';
+
+    protected $_table          = 'modules';
+    protected $_table_p        = 'pages';
+    protected $_table_mp       = 'module_pages';
+    protected $_table_settings = 'settings';
 
     public function  __construct() {
         parent::__construct();
@@ -24,8 +25,12 @@ class Manager_modules extends MY_Model {
      *  @return array();
      */
     public function get_list_module() {
-        $modules = $this->db->select("{$this->_table}.id as id, {$this->_table}.title as title")
-                            ->from($this->_table)->get()->result_array();
+        $modules = $this->db
+            ->select("{$this->_table}.id as id, {$this->_table}.title as title")
+            ->from($this->_table)
+            ->where('enable', 1)
+            ->get()
+            ->result_array();
         return $modules;
     }
 
@@ -37,10 +42,15 @@ class Manager_modules extends MY_Model {
     public function get_page_module($page_id = 0) {
         $page_id = (int)$page_id;
         if ($page_id == 0) return array();
-        $modules = $this->db->select("{$this->_table}.id as id, {$this->_table}.title as title, {$this->_table}.classname as classname")->from($this->_table_mp)
-                            ->join($this->_table, $this->_table.'.id = '.$this->_table_mp.'.module_id', 'left')
-                            ->where('page_id', $page_id)->order_by("{$this->_table_mp}.priority asc")
-                            ->get()->result_array();
+        $modules = $this->db
+            ->select("{$this->_table}.id as id, {$this->_table}.title as title, {$this->_table}.classname as classname")
+            ->from($this->_table_mp)
+            ->join($this->_table, $this->_table.'.id = '.$this->_table_mp.'.module_id', 'left')
+            ->where('page_id', $page_id)
+            ->where('enable', 1)
+            ->order_by("{$this->_table_mp}.priority asc")
+            ->get()
+            ->result_array();
         return $modules;
     }
 
@@ -77,32 +87,44 @@ class Manager_modules extends MY_Model {
     }
 
     public function get_page_data($url, $error_url = 'error404') {
-        if (empty($url) || $url == 'main' ||  $url == '/') {
+        if (empty($url) || $url == 'main' ||  $url == '/')
+        {
             $sql = "select * from `{$this->_table_p}` where `template` = 'main' order by id asc limit 0,1";
             $page = $this->db->query($sql)->row_array();
-            if (count($page) == 0) {
+            if ( count($page) == 0 )
+            {
                 $sql = "select * from `{$this->_table_p}` order by id asc limit 0,1";
                 $page = $this->db->query($sql)->row_array();
             }
-        } else {
-            $page = $this->db->get_where($this->_table_p, array('url' => xss_clean($url), 'show' => 1), 1, 0)->row_array();
+        }
+        else
+        {
+            $page = $this->db
+                ->get_where($this->_table_p, array('url' => xss_clean($url), 'show' => 1), 1, 0)
+                ->row_array();
         }
         if (sizeof($page) == 0) {
             show_404();
             die;
         }
-        $modules = $this->db->select($this->_table.'.*')->from($this->_table_mp)
-                            ->join($this->_table, $this->_table.'.id = '.$this->_table_mp.'.module_id', 'left')
-                            ->where($this->_table_mp.'.page_id', $page['id'])
-                            ->order_by($this->_table_mp.'.priority asc')->get()->result_array();
-        $sql                = "select id, value from {$this->_table_settings} order by id asc";
+        $modules = $this->db
+            ->select($this->_table.'.*')
+            ->from($this->_table_mp)
+            ->join($this->_table, $this->_table.'.id = '.$this->_table_mp.'.module_id', 'left')
+            ->where($this->_table_mp.'.page_id', $page['id'])
+            ->where($this->_table.'.enable', 1)
+            ->order_by($this->_table_mp.'.priority asc')
+            ->get()
+            ->result_array();
 
-        $tmp                            = $this->db->query($sql)->result_array();
-        $site_settings                  = array();
-        $site_settings['title']         = $tmp[0]['value'];
-        $site_settings['description']   = $tmp[1]['value'];
-        $site_settings['keywords']      = $tmp[2]['value'];
-        $site_settings['logo']          = $tmp[5]['value'];
+        $sql = "select id, value from {$this->_table_settings} order by id asc";
+
+        $tmp = $this->db->query($sql)->result_array();
+        $site_settings = array();
+        $site_settings['title']       = $tmp[0]['value'];
+        $site_settings['description'] = $tmp[1]['value'];
+        $site_settings['keywords']    = $tmp[2]['value'];
+        $site_settings['logo']        = $tmp[5]['value'];
         return array('page' => $page, 'modules' => $modules, 'site_settings' => $site_settings);
     }
 
