@@ -65,4 +65,3 @@ $autoload['model'][] = 'text/text_mapper';
 $autoload['model'][] = 'image';
 $autoload['model'][] = 'image_item';
 $autoload['model'][] = 'manager_modules';
-$autoload['model'][] = 'geo_core/shop_mapper';
