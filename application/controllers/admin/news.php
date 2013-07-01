@@ -178,8 +178,6 @@ class News extends Admin_Controller {
         $this->form_validation->set_rules('user_month', '<b>время публикации - месяц</b>','trim|required|is_natural');
         $this->form_validation->set_rules('user_year', '<b>время публикации - год</b>','trim|required|is_natural');
 
-        $this->scripts[]    = base_url().'js/plugins/ckeditor/ckeditor.js';
-
         $category = $this->_news_mapper->get_category($parent_id);
 
         $page_list          = $this->_page_mapper->get_all_pages();

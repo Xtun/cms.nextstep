@@ -42,7 +42,12 @@ class Banner extends Admin_Controller {
     public function add($parent_id = 0) {
         $this->form_validation->set_error_delimiters('', '<br/>');
         $this->form_validation->set_message('required', 'поле "%s" незаполнено');
+        $this->form_validation->set_message('is_natural', 'поле "%s" должно быть целым числом');
         $this->form_validation->set_rules('title', '<b>название</b>','trim|required');
+        $this->form_validation->set_rules('count_per_page', '<b>активных баннеров</b>','required|is_natural');
+        $this->form_validation->set_rules('resize_width', '<b>ширина изображения</b>','required|is_natural');
+        $this->form_validation->set_rules('resize_height', '<b>высота изображения</b>','required|is_natural');
+
         $page_list          = $this->_page_mapper->get_all_pages();
         $page_select        = $this->_get_pages_tree($page_list, $this->_templates['page_select_list'], $this->_templates['page_select_item'], (int)$parent_id);
         $object             = new Banner_category();
@@ -77,7 +82,11 @@ class Banner extends Admin_Controller {
         if (!empty($_POST)) {
             $this->form_validation->set_error_delimiters('', '<br/>');
             $this->form_validation->set_message('required', 'поле "%s" незаполнено');
+            $this->form_validation->set_message('is_natural', 'поле "%s" должно быть целым числом');
             $this->form_validation->set_rules('title', '<b>название</b>','trim|required');
+            $this->form_validation->set_rules('count_per_page', '<b>активных баннеров</b>','required|is_natural');
+            $this->form_validation->set_rules('resize_width', '<b>ширина изображения</b>','required|is_natural');
+            $this->form_validation->set_rules('resize_height', '<b>высота изображения</b>','required|is_natural');
             if ($this->form_validation->run()) {
                 $object->parent_id      = $this->input->post('parent_id');
                 $object->title          = $this->input->post('title');
@@ -129,8 +138,6 @@ class Banner extends Admin_Controller {
     }
 
     public function add_image($parent_id = 0) {
-        $this->scripts[] = base_url('js/plugins/ckeditor/ckeditor.js');
-
         $this->form_validation->set_error_delimiters('', '<br/>');
         $this->form_validation->set_message('required', 'поле "%s" незаполнено');
         $this->form_validation->set_rules('title', '<b>название</b>','trim|required');
@@ -165,10 +172,6 @@ class Banner extends Admin_Controller {
     }
 
     public function edit_image($id = 0, $parent_id = 0, $toggle_display = false) {
-        $this->scripts[] = base_url('js/plugins/ckeditor/ckeditor.js');
-        $this->scripts[] = base_url('js/plugins/ckeditor/ckfinder.js');
-        $this->css[]     = base_url('js/plugins/ckeditor/sample.css');
-
         $parent_id = (int)$parent_id;
         if ((int)$id == 0) redirect(base_url().'admin/banner/'.$parent_id);
         $category               = $this->_banner_mapper->get_category($parent_id, 'object');

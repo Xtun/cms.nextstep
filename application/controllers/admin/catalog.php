@@ -294,7 +294,7 @@ class Catalog extends Admin_Controller
             }
         }
         $section = new Catalog_Section($parent_id);
-        $category_list = $this->catalog_mapper->get_category_list($parent_id);
+        $category_list = $this->catalog_mapper->get_section_category_tree($parent_id);
         $this->_template_data('section', $section);
         $this->_template_data('category_list', $category_list);
         $this->load->admin_view($this->_templates['category_add'], $this->template_data);
@@ -358,11 +358,9 @@ class Catalog extends Admin_Controller
                 redirect(base_url($section->link('cat_list')));
             }
         }
-        $this->scripts[] = base_url('js/plugins/ckeditor/ckeditor.js');
-        $this->scripts[] = base_url('js/plugins/ckfinder/ckfinder.js');
-
         $section = new Catalog_Section($section_id);
-        $category_list = $this->catalog_mapper->get_category_list($section_id);
+        $category_list = $this->catalog_mapper->get_section_category_tree($section_id);
+
         $user_fields = $this->catalog_mapper->get_uf_list($section_id);
 
         $this->_template_data('section', $section);
@@ -435,7 +433,7 @@ class Catalog extends Admin_Controller
         }
         $category = $this->catalog_mapper->get_object($object_id, 'category');
         $section = new Catalog_Section($category->parent_section_id);
-        $category_list = $this->catalog_mapper->get_category_list($category->parent_section_id);
+        $category_list = $this->catalog_mapper->get_section_category_tree($category->parent_section_id);
         $this->_template_data('section', $section);
         $this->_template_data('category', $category);
         $this->_template_data('category_list', $category_list);
@@ -516,14 +514,11 @@ class Catalog extends Admin_Controller
                 redirect(base_url($section->link('cat_list')));
             }
         }
-        $this->scripts[] = base_url('js/plugins/ckeditor/ckeditor.js');
-        $this->scripts[] = base_url('js/plugins/ckfinder/ckfinder.js');
-
         $item = $this->catalog_mapper->get_object($object_id, 'item');
         $item_links = $this->catalog_mapper->get_item_links($item->id);
         $item_images = $this->catalog_mapper->get_item_images($item->id);
         $section = new Catalog_Section($item->section_id);
-        $category_list = $this->catalog_mapper->get_category_list($section->id);
+        $category_list = $this->catalog_mapper->get_section_category_tree($section->id);
         $user_values = $this->catalog_mapper->get_uf_values($section->id, $item->id);
         $user_fields = $this->catalog_mapper->get_uf_list($section->id);
 

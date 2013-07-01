@@ -15,7 +15,7 @@
 	<div id="top-space"></div>
 	<div id="header" style="text-align: center;"><div id="logo" style="float:none!important; margin-left: auto; margin-right: auto;"><a href="/" title=""></a></div></div>
 	<div id="content" style="text-align: center;">
-		<form action="<?=base_url();?>admin/auth/forgetpass/" method="post" id="recovery-passwd" class="admin_auth">
+		<form action="<?= base_url('admin/auth/forgetpass'); ?>" method="post" id="recovery-passwd" class="admin_auth">
 			<table style="margin-left: auto; margin-right: auto;">
 			<tr><td colspan="3"><h2>Восстановление пароля</h2></td></tr>
 			<tr>

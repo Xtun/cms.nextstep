@@ -1,6 +1,6 @@
 <div class="admin_module_title"><h4><?=!empty($module_title) ? $module_title : '';?></h4></div>
 <div id="content">
-    <form action="<?=base_url();?>admin/news/edit/<?=$data['id']?>/<?=$parent_id;?>" method="post">
+    <form action="<?= base_url("admin/news/edit/{$data['id']}/{$parent_id}"); ?>" method="post">
         <table class="admin_module_form">
             <tr><td class="admin_module_form_title"></td><td class="admin_error_message"><?=validation_errors();?></td></tr>
             <tr>

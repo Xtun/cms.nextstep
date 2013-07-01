@@ -20,13 +20,18 @@
         <tr>
           <td class="admin_module_form_title">категория товара</td>
           <td>
-            <select multiple="multiple" name="parent_category_id[]" style="width: 400px;">
+            <select multiple="multiple" name="parent_category_id[]" size="6">
               <option value="0">не выбрано</option>
               <optgroup label="категории">
-                <? foreach ( $category_list as $category ): ?>
-                  <option value="<?= $category->id; ?>" id="<?= $category->id; ?>" <?= in_array($category->id, $item_links) ? 'selected' : ''; ?>>
-                    <?= $category->title; ?>
-                  </option>
+                <? foreach ( $category_list as $cur_category ): ?>
+                    <option value="<?= $cur_category['item']->id; ?>" id="<?= $cur_category['item']->id; ?>" <?= in_array($cur_category['item']->id, $item_links) ? 'selected' : ''; ?>>
+                        <?= $cur_category['item']->title; ?>
+                    </option>
+                    <? foreach ( $cur_category['list'] as $subcategory ): ?>
+                        <option value="<?= $subcategory->id; ?>" id="<?= $subcategory->id; ?>" <?= in_array($subcategory->id, $item_links) ? 'selected' : ''; ?>>
+                            <?= '-- '.$subcategory->title; ?>
+                        </option>
+                    <? endforeach; ?>
                 <? endforeach; ?>
               </optgroup>
             </select>

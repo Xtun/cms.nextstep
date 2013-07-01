@@ -1,6 +1,6 @@
     <div class="admin_module_title"><h4><?=!empty($module_title) ? $module_title : '';?></h4></div>
     <div id="content">
-        <form action="<?=base_url();?>admin/map/add" method="post" enctype="multipart/form-data">
+        <form action="<?=base_url('admin/map/add');?>" method="post" enctype="multipart/form-data">
             <table class="admin_module_form" class="admin_module_map_edit">
                 <tr><td class="admin_module_form_title"></td><td class="admin_error_message"><?=validation_errors();?></td></tr>
                 <tr><td class="admin_module_form_title">название страницы</td><td><input type="text" name="title" value='<?=$this->input->post('title');?>' /></td></tr>

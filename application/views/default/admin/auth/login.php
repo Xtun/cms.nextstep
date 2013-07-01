@@ -15,7 +15,7 @@
 	<div id="top-space"></div>
 	<div id="header" style="text-align: center;"><div id="logo" style="float:none!important; margin-left: auto; margin-right: auto;"><a href="/" title=""></a></div></div>
 	<div id="content" style="text-align: center;">
-		<form action="<?=base_url();?>admin/auth/login/" method="post" class="admin_auth">
+		<form action="<?= base_url('admin/auth/login'); ?>" method="post" class="admin_auth">
 			<table>
 				<tr><td></td><td><h2>Авторизуйтесь</h2></td><td></td></tr>
 				<tr>
