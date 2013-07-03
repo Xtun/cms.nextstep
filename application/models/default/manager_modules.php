@@ -155,4 +155,21 @@ class Manager_modules extends MY_Model {
 
     }
 
+    public function get_module_page ( $classname = '' )
+    {
+        $this->db->select('
+            `pages`.*
+        ');
+        $this->db->from('module_pages');
+        $this->db->join('modules', 'module_pages.module_id = modules.id');
+        $this->db->join('pages', 'module_pages.page_id = pages.id');
+        $this->db->where('modules.classname', ucfirst(strtolower($classname)));
+        $this->db->where('modules.enable', 1);
+        $this->db->where('pages.show', 1);
+        $this->db->order_by('module_pages.priority', 'ASC');
+        $this->db->order_by('pages.level', 'ASC');
+        $this->db->limit(1);
+        return $this->db->get()->row();
+    }
+
 }

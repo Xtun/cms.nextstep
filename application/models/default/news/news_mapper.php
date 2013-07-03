@@ -252,11 +252,11 @@ class News_mapper extends MY_Model implements Mapper {
             $tmp_object->inner_position = !empty($data['inner_position'])   ? $data['inner_position']   : '';
             $tmp_object->created        = !empty($data['created'])          ? $data['created']          : '';
             $user_date                  = !empty($data['user_date'])        ? $data['user_date']        : 0;
-            $tmp_object->user_day       = date("d", $user_date);
-            $tmp_object->user_month     = date("m", $user_date);
-            $tmp_object->user_year      = date("Y", $user_date);
-            $tmp_object->user_hour      = date("H", $user_date);
-            $tmp_object->user_min       = date("i", $user_date);
+            $tmp_object->user_day       = date("d", strtotime($user_date));
+            $tmp_object->user_month     = date("m", strtotime($user_date));
+            $tmp_object->user_year      = date("Y", strtotime($user_date));
+            $tmp_object->user_hour      = date("H", strtotime($user_date));
+            $tmp_object->user_min       = date("i", strtotime($user_date));
             return $tmp_object;
         }
         return false;
@@ -277,6 +277,38 @@ class News_mapper extends MY_Model implements Mapper {
 
         $this->pagination->initialize($config);
         return $this->pagination->create_links();
+    }
+
+    public function search ( $search_query = '' )
+    {
+        $search_query = $this->db->escape_like_str($search_query);
+        $this->db->select('
+            news_item.*,
+            pages.url
+        ');
+        $this->db->from('pages');
+        $this->db->join('news_category', 'news_category.parent_id = pages.id');
+        $this->db->join('news_item', 'news_item.parent_id = news_category.id');
+        $this->db->where('pages.show', 1);
+        $this->db->where("(
+            news_item.title LIKE '%{$search_query}%'
+            OR news_item.anno LIKE '%{$search_query}%'
+            OR news_item.description LIKE '%{$search_query}%'
+        )", NULL, FALSE);
+        $this->db->order_by('pages.level', 'ASC');
+        $search_result = $this->db->get()->result_array();
+
+        $result = array();
+        if ( $search_result )
+        {
+            foreach ( $search_result as $key => $news_obj )
+            {
+                $cur_item['object'] = $this->_get_object($news_obj, 'item');
+                $cur_item['link']   = base_url($news_obj['url'].'?news_id='.$news_obj['id']);
+                $result[] = $cur_item;
+            }
+        }
+        return $result;
     }
 
 }

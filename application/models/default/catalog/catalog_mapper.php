@@ -122,7 +122,9 @@ class Catalog_mapper extends MY_Model implements Mapper
   }
 
   // поиск товаров по title, description, article
-  public function search_item ( $search_query = '' ) {
+  public function search_item ( $search_query = '' )
+  {
+    $search_query = $this->db->escape_like_str($search_query);
     $this->db->select('*');
     $this->db->from(self::TABLE_CATALOG_ITEM);
     $this->db->like('title', $search_query);
@@ -130,6 +132,40 @@ class Catalog_mapper extends MY_Model implements Mapper
     $this->db->or_like('article', $search_query);
     return $this->db->get()->result(self::CLASS_ITEM);
   }
+
+    public function search ( $search_query = '' )
+    {
+        $search_query = $this->db->escape_like_str($search_query);
+        $this->db->select('
+            catalog_item.*,
+            pages.url
+        ');
+        $this->db->from('pages');
+        $this->db->join('catalog_section', 'catalog_section.parent_page_id = pages.id');
+        $this->db->join('catalog_item', 'catalog_item.section_id = catalog_section.id');
+        $this->db->where('pages.show', 1);
+        $this->db->where('catalog_section.is_deleted', 0);
+        $this->db->where('catalog_item.is_deleted', 0);
+        $this->db->where("(
+            catalog_item.title LIKE '%{$search_query}%'
+            OR catalog_item.article LIKE '%{$search_query}%'
+            OR catalog_item.description LIKE '%{$search_query}%'
+        )", NULL, FALSE);
+        $this->db->order_by('pages.level', 'ASC');
+        $search_result = $this->db->get()->result(self::CLASS_ITEM);
+
+        $result = array();
+        if ( $search_result )
+        {
+            foreach ( $search_result as $key => $catalog_obj )
+            {
+                $cur_item['object'] = $catalog_obj;
+                $cur_item['link']   = base_url($catalog_obj->url);
+                $result[] = $cur_item;
+            }
+        }
+        return $result;
+    }
 
   public function get_num_products ( $section_id = 0 )
   {
@@ -599,8 +635,7 @@ class Catalog_mapper extends MY_Model implements Mapper
 
   public function get_yml ( $model = FALSE, $vendor = 'NoName' )
   {
-    $manager_modules = new Manager_modules();
-    $page_info = $manager_modules->get_page_data(array());
+    $page_info = $this->manager_modules->get_page_data(array());
 
     $category_list = $this->get_full_category_list();
 

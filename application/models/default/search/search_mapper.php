@@ -1,62 +1,77 @@
 <?php
 
-/*
- * Поисковый движок
- *
- * @author rav <arudyuk@rg3.su>
- * @version 1.5
- * @copyright RG3 Development
- */
+class Search_mapper extends MY_Model
+{
 
-class Search_mapper extends MY_Model {
+    protected $_search_param;
+    protected $_search_url;
+    protected $_search_value;
 
-    protected $_tables;
-    protected $_select_content_symb;
-
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->_tables['news_category'] = 'news_category';
-        $this->_tables['news_item']     = 'news_item';
-        $this->_tables['text_item']     = 'text_item';
-        $this->_tables['pages']         = 'pages';
-        $this->_template['index']       = 'search/index';
-        $this->_select_content_symb     = 200;
+        $this->_template['search_form']   = 'search/form';
+        $this->_template['search_result'] = 'search/results';
+
+        $this->_search_param = 'search';
+        $this->_search_url   = $this->_get_search_url();
+
+        if ( $search = $this->input->post($this->_search_param) )
+        {
+            $this->_search_value = $search;
+        } else {
+            $this->_search_value = '';
+        }
     }
 
-    public function get_page_content() {
-        $sentence = isset($_GET['s']) ? $_GET['s'] : '';
-        $result = array();
-        if ($this->uri->segment(1)!='search2') {
-            $result += $this->_get_text_content($sentence);
-        }
-        if ($this->uri->segment(1)!='search1') {
-            $result += $this->_get_news_content($sentence);
-        }
-        if ($result) {
-            foreach ($result as $key => $page) {
-                $first_pos = mb_strpos($result[$key]['content'], $sentence);
-                $result[$key]['content'] = mb_substr($result[$key]['content'], $first_pos, $this->_select_content_symb);
-                $result[$key]['content'] = str_replace($sentence, '<b>' . $sentence . '</b>', $result[$key]['content']);
-            }
-        }
-        return $this->load->site_view($this->_template['index'], array('content' => $result), true);
+    public function get_form ()
+    {
+        $template_data = array();
+        $template_data['search']['param'] = $this->_search_param;
+        $template_data['search']['url']   = $this->_search_url;
+        $template_data['search']['value'] = $this->_search_value;
+        return $this->load->site_view($this->_template['search_form'], $template_data, TRUE);
     }
 
-    protected function _get_text_content($sentence = '') {
-        if (empty($sentence)) return array();
-        $sql = "select t.parent_id parent_id, t.description description, p.url url
-                from {$this->_tables['text_item']} t inner join {$this->_tables['pages']} p on p.id=t.parent_id
-                where t.description like '%".$sentence."%' and p.show = 1";
-        $pages = $this->db->query($sql)->result_array();
-        $content_url_array = array();
-        foreach ($pages as $page) {
-            if ($page['url'] != 'dev' && $page['url'] != 'error404') {
-                if ($page['url'] == '') $page['url'] = 'main';
-                $content = $this->_parse_string($page['description']);
-                $content_url_array[] = array('content' => mb_strtolower($content), 'url' => $page['url']);
+    protected function _get_search_url ()
+    {
+        $module_page = $this->manager_modules->get_module_page(__CLASS__);
+        if ( $module_page )
+        {
+            return base_url($module_page->url);
+        }
+        return '';
+    }
+
+    public function get_page_content ( $page_id = 0 )
+    {
+        $search_result = array();
+        $search_result['count']   = 0;
+        $search_result['text']    = array();
+        $search_result['news']    = array();
+        $search_result['catalog'] = array();
+        if ( $this->_search_value )
+        {
+            if ( SEARCH_MODULE_TEXT )
+            {
+                $search_result['text']  = $this->text_mapper->search($this->_search_value);
+                $search_result['count'] += count($search_result['text']);
+            }
+            if ( SEARCH_MODULE_NEWS )
+            {
+                $search_result['news']  = $this->news_mapper->search($this->_search_value);
+                $search_result['count'] += count($search_result['news']);
+            }
+            if ( SEARCH_MODULE_CATALOG )
+            {
+                $search_result['catalog'] = $this->catalog_mapper->search($this->_search_value);
+                $search_result['count']   += count($search_result['catalog']);
             }
         }
-        return $content_url_array;
+
+        $template_data = array();
+        $template_data['search_result'] = $search_result;
+        return $this->load->site_view($this->_template['search_result'], $template_data, TRUE);
     }
 
     protected function _get_news_content($sentence = '') {
@@ -72,15 +87,6 @@ class Search_mapper extends MY_Model {
             $content_url_array[] = array('content' => mb_strtolower($content), 'url' => $page['url'].'?news_id='.$page['id']);
         }
         return $content_url_array;
-    }
-
-    protected function _parse_string($str) {
-        $str = trim($str);
-        $str = preg_replace("/[^\x20-\xFF]/", "", @strval($str));
-        $str = preg_replace("/&(.+?);/", "", @strval($str));
-        $str = strip_tags($str);
-        $str = htmlspecialchars($str, ENT_QUOTES);
-        return $str;
     }
 
 }

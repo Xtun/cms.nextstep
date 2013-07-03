@@ -50,6 +50,9 @@ $autoload['config'][] = 'cms_config';
 
 $autoload['model'] = array();
 
+$autoload['model'][] = 'manager_modules';
+$autoload['model'][] = 'image';
+$autoload['model'][] = 'image_item';
 $autoload['model'][] = 'banner/banner_mapper';
 $autoload['model'][] = 'cart/cart_mapper';
 $autoload['model'][] = 'catalog/catalog_mapper';
@@ -62,6 +65,3 @@ $autoload['model'][] = 'response/response_mapper';
 $autoload['model'][] = 'search/search_mapper';
 $autoload['model'][] = 'sitemap/sitemap_mapper';
 $autoload['model'][] = 'text/text_mapper';
-$autoload['model'][] = 'image';
-$autoload['model'][] = 'image_item';
-$autoload['model'][] = 'manager_modules';
