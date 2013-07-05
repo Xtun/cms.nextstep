@@ -24,6 +24,12 @@
       <label for="billing_company" class="">Адрес</label>
       <input type="text" class="input-text" name="address" value="<?=set_value('address');?>" id="billing_company" placeholder="Адрес" />
     </div>
+    <div class="six columns alpha">
+      <label for="billing_company" class="">Способ оплаты</label>
+      <select name="payment_method">
+        <option value="1">Наличными</option>
+      </select>
+    </div>
     <div class="clear"></div>
   </div>
 

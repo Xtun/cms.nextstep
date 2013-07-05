@@ -21,6 +21,7 @@ $config['admin_menu']['admin/response']    = 'отзывы';
 $config['admin_menu']['admin/gallery']     = 'галереи';
 $config['admin_menu']['admin/banner']      = 'виджеты';
 $config['admin_menu']['admin/catalog']     = 'каталог';
+$config['admin_menu']['admin/cart']        = 'заказы';
 $config['admin_menu']['admin/feedback']    = 'ФОС';
 $config['admin_menu']['admin/comments']    = 'комментарии';
 $config['admin_menu']['admin/settings']    = 'настройка';

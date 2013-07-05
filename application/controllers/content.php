@@ -3,6 +3,7 @@
 class Content extends MY_Controller {
 
     protected $_contact_text_id;
+    protected $_mm_type;
 
     public function  __construct() {
         parent::__construct();
@@ -10,36 +11,50 @@ class Content extends MY_Controller {
         $this->templates['menu_item']    = 'menu/top_item';
         $this->templates['sitemap_list'] = 'sitemap/list';
         $this->templates['sitemap_item'] = 'sitemap/item';
+
+        $this->_mm_type['xml']  = 'text/xml; charset=utf-8';
+        $this->_mm_type['html'] = 'text/html; charset=utf-8';
+        $this->_mm_type['text'] = 'text/plain; charset=utf-8';
     }
 
     public function index() {
         $this->_dispatch();
     }
 
-    public function check_phone_number ( $phone )
+    public function rss ()
     {
-        if ( ! preg_match("/^(\+?\d+)?\s*(\(\d+\))?[\s-]*([\d-]*)$/", $phone) )
-        {
-            $this->form_validation->set_message('check_phone_number', 'поле <strong>%s</strong> имеет неверный формат');
-            return FALSE;
-        }
-        return TRUE;
+        $xml_rss = $this->news_mapper->get_rss();
+        $this->send_output($this->_mm_type['xml'], $xml_rss);
     }
 
-    public function rss() {
-        $rss = $this->news_mapper->get_rss();
-        ob_clean();
-        print($rss);
+    public function yml ()
+    {
+        $xml_yml = $this->catalog_mapper->get_yml();
+        $this->send_output($this->_mm_type['xml'], $xml_yml);
     }
 
-    public function yml() {
-        $yml = $this->catalog_mapper->get_yml();
-        ob_clean();
-        print($yml);
+    public function sitemap_xml ()
+    {
+        $xml_sitemap = $this->sitemap_mapper->get_sitemap_xml();
+        $this->send_output($this->_mm_type['xml'], $xml_sitemap);
+    }
+
+    public function robots_txt ()
+    {
+        $robots_txt = $this->manager_modules->get_settings('ROBOTS_TXT');
+        $this->send_output($this->_mm_type['text'], $robots_txt);
     }
 
     public function error404() {
         $this->_dispatch('/content/error404');
+    }
+
+    protected function send_output ( $content_type = 'text/html', $data = '' )
+    {
+        ob_clean();
+        $this->output
+            ->set_content_type($content_type)
+            ->set_output($data);
     }
 
     protected function _dispatch($init_url = '') {
@@ -98,7 +113,7 @@ class Content extends MY_Controller {
             }
         }
 
-        $counters = $this->manager_modules->settings();
+        $counters = $this->manager_modules->get_settings();
 
         $page_data['menu']          = $menu;
         $page_data['submenu']       = $submenu;
@@ -110,6 +125,16 @@ class Content extends MY_Controller {
         $template = $page_info['page']['template'];
 
         $this->load->site_view($template, $page_data);
+    }
+
+    public function check_phone_number ( $phone )
+    {
+        if ( ! preg_match("/^(\+?\d+)?\s*(\(\d+\))?[\s-]*([\d-]*)$/", $phone) )
+        {
+            $this->form_validation->set_message('check_phone_number', 'поле <strong>%s</strong> имеет неверный формат');
+            return FALSE;
+        }
+        return TRUE;
     }
 
 }

@@ -128,14 +128,21 @@ class Manager_modules extends MY_Model {
         return array('page' => $page, 'modules' => $modules, 'site_settings' => $site_settings);
     }
 
-    public function settings ()
+    public function get_settings ( $setting_name = '' )
     {
-        $settings = $this->db
-            ->select('*')
-            ->from($this->_table_settings)
-            ->order_by('id', 'ASC')
-            ->get()->result_array();
-        $result = array ();
+        $result = array();
+        $this->db->select('*');
+        $this->db->from($this->_table_settings);
+        if ( $setting_name )
+        {
+            $this->db->where('name', mb_strtoupper($setting_name));
+        }
+        $this->db->order_by('id', 'ASC');
+        if ( $setting_name )
+        {
+            return $this->db->get()->row()->value;
+        }
+        $settings = $this->db->get()->result_array();
         foreach ( $settings as $key => $value )
         {
             $result[$value['name']] = $value['value'];
@@ -143,16 +150,15 @@ class Manager_modules extends MY_Model {
         return $result;
     }
 
-    public function set_cart_serttings ( $cart_data = array() )
+    public function set_settings ( $settings = array() )
     {
         $data = array();
-        foreach ( $cart_data as $data_name => $data_val )
+        foreach ( $settings as $name => $value )
         {
-            $data['value'] = $data_val;
-            $this->db->where('name', $data_name);
+            $data['value'] = $value;
+            $this->db->where('name', mb_strtoupper($name));
             $this->db->update($this->_table_settings, $data);
         }
-
     }
 
     public function get_module_page ( $classname = '' )

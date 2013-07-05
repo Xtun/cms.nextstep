@@ -3,6 +3,8 @@
 $route['default_controller'] = 'content';
 $route['rss(.)*']            = 'content/rss';
 $route['yml(.)*']            = 'content/yml';
+$route['sitemap.xml']        = 'content/sitemap_xml';
+$route['robots.txt']         = 'content/robots_txt';
 $route['^admin$']            = 'admin/map';
 $route['admin/auth']         = 'admin/auth/login';
 $route['admin/(.+)']         = 'admin/$1';

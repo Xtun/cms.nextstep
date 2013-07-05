@@ -1,9 +1,5 @@
-<?
-header('Content-Type: text/xml; charset=utf-8');
-print('<?xml version="1.0" encoding="utf-8"?>' . "\n");
-print('<!DOCTYPE yml_catalog SYSTEM "shops.dtd">' . "\n");
-?>
-
+<?= '<?xml version="1.0" encoding="utf-8"?>'."\n"; ?>
+<?= '<!DOCTYPE yml_catalog SYSTEM "shops.dtd">'."\n"; ?>
 <yml_catalog date="<?= $yml['catalog_date']; ?>">
     <shop>
         <name><?= $yml['shop_name']; ?></name>

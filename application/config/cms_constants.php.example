@@ -1,11 +1,12 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /*
-    SETUP CONSTANTS:
+    Первичная настройка констант:
 
-    Настройка окружения      = ENVIRONMENT
-    Настройка БД             = DB_USERNAME, DB_PASSWORD, DB_DATABASE
-    Настройка директорий тем = THEME_CUSTOM_VIEWS_PATH, THEME_CUSTOM_MODELS_PATH
+    текущее окружение             = ENVIRONMENT
+    параметры подключения к БД    = DB_HOSTNAME, DB_USERNAME, DB_PASSWORD, DB_DATABASE
+    название темы для отображений = THEME_CUSTOM_VIEWS_PATH
+    название темы для моделей     = THEME_CUSTOM_MODELS_PATH
 */
 
 /*
@@ -162,11 +163,19 @@ define('SEARCH_MODULE_CATALOG', TRUE);
 
 /*
 |--------------------------------------------------------------------------
+| RSS CONSTS
+|--------------------------------------------------------------------------
+*/
+
+define('RSS_DEFAULT_TITLE', 'Новости RSS канал');
+define('RSS_LANGUAGE', 'ru-ru');
+define('RSS_WEBMASTER', 'dev@rg3.su');
+
+/*
+|--------------------------------------------------------------------------
 | DEPRECATED CONSTS
 |--------------------------------------------------------------------------
 */
 
-// rss site name
-define('SITE_NAME', 'RG3 DEVELOPMENT');
 // auth-forget password email from
 define('EMAIL','info@rg3.su');

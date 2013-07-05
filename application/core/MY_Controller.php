@@ -94,9 +94,10 @@ class Admin_Controller extends CI_Controller
         $this->css[] = base_url('www_admin/css/style.css');
         // JS
         $this->scripts[] = base_url('www_admin/js/jquery-1.7.min.js');
-        $this->scripts[] = base_url('www_admin/js/jquery-ui-1.8.16.custom.min.js');
         // Plugins
+        $this->css[]     = base_url('plugins/jquery-ui/css/jquery-ui-1.9.2.custom.min.css');
         $this->css[]     = base_url('plugins/formstyler/jquery.formstyler.css');
+        $this->scripts[] = base_url('plugins/jquery-ui/jquery-ui-1.9.2.custom.min.js');
         $this->scripts[] = base_url('plugins/formstyler/jquery.formstyler.min.js');
         $this->scripts[] = base_url('plugins/ckeditor/ckeditor.js');
 

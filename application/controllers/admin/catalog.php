@@ -86,20 +86,20 @@ class Catalog extends Admin_Controller
             $this->form_validation->set_message('valid_email', 'Поле "%s" должно быть e-mail.');
             if ( $this->form_validation->run() )
             {
-                $cart_data['cart_client_sender_email']   = $this->input->post('cart_client_sender_email');
-                $cart_data['cart_client_sender_name']    = $this->input->post('cart_client_sender_name');
-                $cart_data['cart_client_subject']        = $this->input->post('cart_client_subject');
-                $cart_data['cart_client_message']        = $this->input->post('cart_client_message');
-                $cart_data['cart_operator_sender_email'] = $this->input->post('cart_operator_sender_email');
-                $cart_data['cart_operator_sender_name']  = $this->input->post('cart_operator_sender_name');
-                $cart_data['cart_operator_subject']      = $this->input->post('cart_operator_subject');
-                $cart_data['cart_operator_email']        = $this->input->post('cart_operator_email');
-                $cart_data['cart_operator_message']      = $this->input->post('cart_operator_message');
-                $this->manager_modules->set_cart_serttings($cart_data);
+                $cart_data['CART_CLIENT_SENDER_EMAIL']   = $this->input->post('cart_client_sender_email');
+                $cart_data['CART_CLIENT_SENDER_NAME']    = $this->input->post('cart_client_sender_name');
+                $cart_data['CART_CLIENT_SUBJECT']        = $this->input->post('cart_client_subject');
+                $cart_data['CART_CLIENT_MESSAGE']        = $this->input->post('cart_client_message');
+                $cart_data['CART_OPERATOR_SENDER_EMAIL'] = $this->input->post('cart_operator_sender_email');
+                $cart_data['CART_OPERATOR_SENDER_NAME']  = $this->input->post('cart_operator_sender_name');
+                $cart_data['CART_OPERATOR_SUBJECT']      = $this->input->post('cart_operator_subject');
+                $cart_data['CART_OPERATOR_EMAIL']        = $this->input->post('cart_operator_email');
+                $cart_data['CART_OPERATOR_MESSAGE']      = $this->input->post('cart_operator_message');
+                $this->manager_modules->set_settings($cart_data);
             }
         }
 
-        $cart_settings = $this->manager_modules->settings();
+        $cart_settings = $this->manager_modules->get_settings();
 
         $this->_template_data('catalog_section_list', $catalog_section_list);
         $this->_template_data('cart_settings', $cart_settings);
@@ -546,7 +546,8 @@ class Catalog extends Admin_Controller
     private function _category_del ( $object )
     {
         $this->catalog_mapper->delete($object, 'category');
-        redirect($this->_url['section_index']);
+        $section = new Catalog_Section($object->parent_section_id);
+        redirect(base_url($section->link('cat_list')));
     }
 
     private function _items_del ( $object )
