@@ -79,7 +79,7 @@ Examples:
 
 ATTENTION: The trailing slash is required.
 */
-$baseDir = dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/www/upload/editor/';
+$baseDir = dirname(dirname(dirname(dirname(__FILE__)))).'/www/upload/editor/';
 
 /*
  * ### Advanced Settings
