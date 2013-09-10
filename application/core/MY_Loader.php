@@ -146,7 +146,7 @@ class MY_Loader extends CI_Loader
         return FALSE;
     }
 
-    public function widget ( $view, $data )
+    public function widget ( $view, $data = array() )
     {
         $vars = array();
         $vars['data'] = $data;

@@ -209,9 +209,9 @@ class Cart_mapper extends MY_Model
         $cart_settings = $this->manager_modules->get_settings();
 
         // список товаров в заказе
-        $purchases = '
+        $purchases = "
             <p>Номер заказа: {$order_id}</p>
-            <table style="width:100%;">
+            <table style='width:100%;'>
                 <tr>
                     <td>Наименование</td>
                     <td>Количество</td>
@@ -219,7 +219,7 @@ class Cart_mapper extends MY_Model
                     <td>Сумма</td>
                     <td>Артикул</td>
                 </tr>
-        ';
+        ";
         foreach ( $this->cart->contents() as $cart_item )
         {
             $purchases .= "
