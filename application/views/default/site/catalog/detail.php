@@ -26,6 +26,12 @@
 */
 ?>
 
+<style type="text/css">
+  .old-price {
+      text-decoration: line-through;
+  }
+</style>
+
 <div class="padcontent product-detail">
   <h3>
     <?= $item->title; ?>
@@ -36,7 +42,10 @@
   <div class="one_half lastcols">
 
     <div class="price">
-      <?= $item->price(); ?>
+      <? if ($item->price_discount() !== $item->price()) : ?>
+        <span class="price discount <?=$item->price_discount() !== $item->price() ? 'sale-price' : 'hidden-price' ?>"><?= $item->price_discount() !== $item->price() ? $item->price_discount() : ''; ?></span><br/>
+      <? endif; ?>
+      <span class="price <?=$item->price_discount() !== $item->price() ? 'old-price' : '' ?>"><?= $item->price(); ?></span>
     </div>
     <div class="variations_button">
         <button id="add_to_cart" class="button alt" type="submit">Добавить в корзину</button>

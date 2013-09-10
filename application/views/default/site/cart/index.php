@@ -40,7 +40,7 @@
               </a>
             </td>
             <td class="unit-price">
-              <?= $cur_item->price(); ?>
+              <?= $cur_item->price_discount(); ?>
             </td>
             <td>
               <div class="quantity buttons_added">
@@ -76,11 +76,20 @@
   <table cellspacing="0" cellpadding="0">
     <tbody>
       <tr class="cart-subtotal">
-        <th>Итого :</th>
+        <th>Итого (без скидки):</th>
         <td>
-          <?= $this->cart->format_number($this->cart->total()); ?>
+          <?= $this->cart->format_number($total); ?>
         </td>
       </tr>
+
+      <? if ( $discount_price > 0 ) : ?>
+        <tr class="cart-subtotal">
+          <th>Итого (со скидкой):</th>
+          <td>
+            <?= $total_price; ?>
+          </td>
+        </tr>
+      <? endif; ?>
     </tbody>
   </table>
 </div>

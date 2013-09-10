@@ -52,6 +52,16 @@
                         <span class="right priority" title="порядок">
                             <?= $category->priority; ?>
                         </span>
+                        <? if ($category->discount_price > 0) : ?>
+                            <span class="right" title="скидка">
+                                <strong>Скидка:</strong> <?= $category->discount_price; ?>
+                            </span>
+                        <? endif; ?>
+                        <? if ($category->discount_percent > 0) : ?>
+                            <span class="right" title="скидка %">
+                                <strong>Скидка %:</strong> <?= $category->discount_percent; ?>
+                            </span>
+                        <? endif; ?>
                     </div>
                 </li>
             <? endforeach; ?>

@@ -88,7 +88,14 @@
           <td class="admin_module_form_title">Цена</td>
           <td><input class="styler" type="text" name="price" value='<?= $item->price; ?>' /></td>
         </tr>
-
+        <tr>
+          <td class="admin_module_form_title">Скидка в рублях</td>
+          <td><input class="styler" type="text" name="discount-price" value='<?= $item->discount_price; ?>' /></td>
+        </tr>
+        <tr>
+          <td class="admin_module_form_title">Скидка в процентах (приоритетная)</td>
+          <td><input class="styler" type="text" name="discount-percent" value='<?= $item->discount_percent; ?>' /></td>
+        </tr>
         <tr>
           <td class="admin_module_form_title">Товар в наличии</td>
           <td><input type="checkbox" name="in_stock" <?= ( $item->in_stock == '1' ) ? 'checked' : ''; ?> /></td>

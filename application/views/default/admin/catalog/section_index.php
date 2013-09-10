@@ -28,6 +28,11 @@
                 <button class="styler">создать каталог</button>
             </a>
         </li>
+        <li>
+            <a href="<?= base_url('admin/catalog/discounts'); ?>">
+                <button class="styler">управление скидками</button>
+            </a>
+        </li>
     </ul>
 
     <form action="/admin/catalog/index" method="post" class="set_form">

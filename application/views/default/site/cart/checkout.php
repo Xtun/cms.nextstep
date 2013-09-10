@@ -70,7 +70,7 @@
           </a>
         </td>
         <td class="unit-price">
-          <?= $cur_item->price(); ?>
+          <?= $cur_item->price_discount(); ?>
         </td>
         <td><?= $item['qty']; ?></td>
         <td>
@@ -83,12 +83,21 @@
 
 <table class="checkout_totals">
   <tbody>
-    <tr class="total">
-      <th>Сумма :</th>
-      <td>
-        <?= $this->cart->format_number($this->cart->total()); ?>
-      </td>
-    </tr>
+    <tr class="cart-subtotal">
+        <th>Итого (без скидки):</th>
+        <td>
+          <?= $this->cart->format_number($total); ?>
+        </td>
+      </tr>
+
+      <? if ( $discount_price > 0 ) : ?>
+        <tr class="cart-subtotal">
+          <th>Итого (со скидкой):</th>
+          <td>
+            <?= $total_price; ?>
+          </td>
+        </tr>
+      <? endif; ?>
   </tbody>
 </table>
 <br>

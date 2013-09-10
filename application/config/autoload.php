@@ -65,3 +65,4 @@ $autoload['model'][] = 'response/response_mapper';
 $autoload['model'][] = 'search/search_mapper';
 $autoload['model'][] = 'sitemap/sitemap_mapper';
 $autoload['model'][] = 'text/text_mapper';
+$autoload['model'][] = 'users/user_mapper';

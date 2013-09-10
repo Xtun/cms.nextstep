@@ -11,6 +11,8 @@ class Catalog_Item extends MY_Model_Catalog
     public $description;
     public $article;
     public $price;
+    public $discount_price;
+    public $discount_percent;
     public $section_id;
     public $in_stock;
     public $is_bestseller;
@@ -24,6 +26,8 @@ class Catalog_Item extends MY_Model_Catalog
         $this->description   = '';
         $this->article       = '';
         $this->price         = 0;
+        $this->discount_price   = 0;
+        $this->discount_percent = 0;
         $this->section_id    = 0;
         $this->in_stock      = 0;
         $this->is_bestseller = 0;
@@ -121,6 +125,13 @@ class Catalog_Item extends MY_Model_Catalog
     public function price()
     {
         return $this->cart->format_number($this->price) . ' ' . $this->currency();
+    }
+
+    // получить строковое представление цены
+    public function price_discount()
+    {
+        $price_discount = $this->get_discount_price();
+        return $this->cart->format_number($price_discount) . ' ' . $this->currency();
     }
 
     public function catalog_url ()
@@ -237,6 +248,69 @@ class Catalog_Item extends MY_Model_Catalog
         $replacements[8] = '&quot;';
 
         return preg_replace($patterns, $replacements, $string);
+    }
+
+    public function get_discount_price()
+    {
+        // вычисляем цену со скидкой от продукта, скидка продукта важнее скидки категории
+        if ($this->discount_percent > 0 && $this->discount_percent < 100)
+        {
+            $cent_price     = $this->price * 100;
+            $discount_price = $cent_price - ($cent_price/100)*$this->discount_percent;
+            return ceil($discount_price)/100;
+        }
+        elseif ($this->discount_price > 0 && $this->discount_price < $this->price)
+        {
+            $tmp_price = $this->price - $this->discount_price;
+            $tmp_price = $tmp_price > 0 ? $tmp_price : 0;
+            return $tmp_price;
+        }
+        return $this->price;
+    }
+
+    public function exist_discount_category() {
+        // получаем скидку от категории
+        $category_discount = $this->_get_discount_category();
+        if ($this->discount_percent == 0 && $this->discount_price == 0)
+        {
+            $this->discount_percent = $category_discount['percent'];
+            $this->discount_price = $category_discount['price'];
+        }
+    }
+
+    protected function _get_discount_category()
+    {
+        $category_list  = $this->_get_item_category_list();
+        if (!count($category_list)) return array('price' => 0, 'percent' => 0);
+
+        $tmp_discount_percent   = 0;
+        $tmp_discount_price    = 0;
+        foreach ($category_list as $category) {
+            $tmp_discount_price     = $category->discount_price > $tmp_discount_price ? $category->discount_price : $tmp_discount_price;
+            $tmp_discount_percent   = $category->discount_percent > $tmp_discount_percent ? $category->discount_percent : $tmp_discount_percent;
+        }
+        return array('price' => $tmp_discount_price, 'percent' => $tmp_discount_percent);
+    }
+
+    // дублируем метод из маппера, необходимо получить список категорий для подсчета скидки
+    protected function _get_item_category_list ()
+    {
+        $this->db->distinct();
+        $this->db->select('
+          catalog_category.id,
+          catalog_category.parent_category_id,
+          catalog_category.parent_section_id,
+          catalog_category.discount_price,
+          catalog_category.discount_percent,
+          catalog_category.title
+        ');
+        $this->db->from('catalog_category');
+        $this->db->join('catalog_item_links', 'catalog_item_links.category_id = catalog_category.id');
+        $this->db->join('catalog_item', 'catalog_item.id = catalog_item_links.item_id');
+        $this->db->where('catalog_item.id', $this->id);
+        $this->db->where('catalog_category.is_deleted', 0);
+        $this->db->where('catalog_item.is_deleted', 0);
+        return $this->db->get()->result(self::CLASS_CATEGORY);
     }
 
 }

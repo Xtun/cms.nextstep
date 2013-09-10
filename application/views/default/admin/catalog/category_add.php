@@ -43,6 +43,14 @@
                     <td><input type="text" name="title" value='<?= set_value('title'); ?>' /></td>
                 </tr>
                 <tr>
+                    <td class="admin_module_form_title">Скидка в рублях</td>
+                    <td><input class="styler" type="text" name="discount-price" value='' /></td>
+                </tr>
+                <tr>
+                    <td class="admin_module_form_title">Скидка в процентах (приоритетная)</td>
+                    <td><input class="styler" type="text" name="discount-percent" value='' /></td>
+                </tr>
+                <tr>
                     <td class="admin_module_form_title">приоритет</td>
                     <td>
                         <input type="text" style="width: 100px;" name="priority" value="<?= set_value('priority', 0); ?>" />

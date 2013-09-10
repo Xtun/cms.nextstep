@@ -5,6 +5,7 @@ class Cart_mapper extends MY_Model
 
     public function  __construct() {
         parent::__construct();
+
         $this->load->library('cart');
 
         $this->_table_item  = 'cart_item';
@@ -16,6 +17,35 @@ class Cart_mapper extends MY_Model
 
         $this->cart->product_name_rules = '\d\D';
         $this->cart->product_id_rules   = '^.';
+    }
+
+    public function get_client_orders ( $client_id = 0 )
+    {
+        $order_list = $this->db->select('*')
+            ->from($this->_table_order)
+            ->where('client_id', $client_id)
+            ->get()
+            ->result();
+
+        $result = array();
+        foreach ( $order_list as $key => $order )
+        {
+            $data['order'] = $order;
+
+            $cart_data     = array();
+            $data['items'] = array();
+
+            $cart_items = $this->get_cart_items($order->id);
+            foreach ( $cart_items as $index => $cart_item )
+            {
+                $cart_data['cart'] = $cart_item;
+                $cart_data['catalog'] = $this->catalog_mapper->get_object($cart_item->item_id, 'item');
+                $data['items'][] = $cart_data;
+            }
+            $result[] = $data;
+        }
+        // print_r($result);exit;
+        return $result;
     }
 
     public function get_history ( $limit = 0, $order_by = 'id', $order_type = 'ASC', $date_from = 0, $date_to = 0 )
@@ -70,6 +100,36 @@ class Cart_mapper extends MY_Model
 
     public function get_page_content($page_id = 0)
     {
+        $total = $this->cart->total();
+        $discount_price = 0;
+
+        $client = $this->user_mapper->is_client();
+        if ( $client )
+        {
+            $saving_discount = $this->catalog_mapper->get_saving_discount($client->order_sum);
+            if ( $saving_discount )
+            {
+                if ($saving_discount->discount_percent > 0 && $saving_discount->discount_percent < 100)
+                {
+                    $discount_price = $total - (($total * $saving_discount->discount_percent) / 100);
+                    $discount_price = $this->cart->format_number($discount_price);
+                }
+                elseif ($saving_discount->discount_price > 0 && $saving_discount->discount_price < $total)
+                {
+                    $discount_price = $total - $saving_discount->discount_price;
+                }
+            }
+        }
+
+        $total_price = ($discount_price > 0) ? $discount_price : $total;
+
+        $template_data = array();
+
+        $template_data['client']         = $client;
+        $template_data['total']          = $total;
+        $template_data['total_price']    = $total_price;
+        $template_data['discount_price'] = $discount_price;
+
         $this->form_validation->set_rules('full_name', 'Фамилия, имя', 'required');
         $this->form_validation->set_rules('email', 'Электронный адрес', 'required|valid_email');
         $this->form_validation->set_rules('phone', 'Телефон', 'required');
@@ -82,13 +142,13 @@ class Cart_mapper extends MY_Model
         {
             if ( $_POST['type'] == 'order' )
             {
-                return $this->load->site_view($this->_template['checkout'], array(), TRUE);
+                return $this->load->site_view($this->_template['checkout'], $template_data, TRUE);
             }
             if ( $_POST['type'] == 'save' )
             {
                 if ( $this->form_validation->run() )
                 {
-                    if ( $this->cart->total() )
+                    if ( $total )
                     {
                         $now = date("Y-m-d H:i:s", time());
                         // save order
@@ -99,10 +159,17 @@ class Cart_mapper extends MY_Model
                         $order_data['email']           = $this->input->post('email');
                         $order_data['comments']        = $this->input->post('comments');
                         $order_data['payment_method']  = $this->input->post('payment_method');
-                        $order_data['order_total']     = $this->cart->total();
+                        $order_data['order_total']     = $total_price;
                         $order_data['positions_total'] = $this->cart->total_items();
                         $order_data['items_total']     = count($this->cart->contents());
                         $order_data['date_created']    = $now;
+
+                        if ( $client )
+                        {
+                            $order_data['client_id'] = $client->id;
+                            $this->user_mapper->inc_order_sum($client->id, $total_price);
+                        }
+
                         $this->db->insert('cart_order', $order_data);
 
                         $order_id = $this->db->insert_id();
@@ -123,26 +190,27 @@ class Cart_mapper extends MY_Model
 
                         // TODO: payment operations
 
-                        $this->_send_mails($this->input->post('email'), $order_id);
+                        $this->_send_mails($this->input->post('email'), $order_id, $total_price);
                         $this->cart->destroy();
                     } else {
                         redirect(base_url('catalog'));
                     }
                     return $this->load->site_view($this->_template['thankyou'], array(), TRUE);
                 } else {
-                    return $this->load->site_view($this->_template['checkout'], array(), TRUE);
+                    return $this->load->site_view($this->_template['checkout'], $template_data, TRUE);
                 }
             }
         }
-        return $this->load->site_view($this->_template['index'], array(), TRUE);
+        return $this->load->site_view($this->_template['index'], $template_data, TRUE);
     }
 
-    private function _send_mails ( $user_email, $order_id )
+    private function _send_mails ( $user_email, $order_id, $total_price )
     {
         $cart_settings = $this->manager_modules->get_settings();
 
         // список товаров в заказе
         $purchases = '
+            <p>Номер заказа: {$order_id}</p>
             <table style="width:100%;">
                 <tr>
                     <td>Наименование</td>
@@ -166,10 +234,10 @@ class Cart_mapper extends MY_Model
         }
         $purchases .= "
             <tr>
-                <td>Сумма заказа:</td>
+                <td>Итоговая сумма заказа:</td>
                 <td></td>
                 <td></td>
-                <td>" . $this->cart->format_number($this->cart->total()) . "</td>
+                <td>" . $this->cart->format_number($total_price) . "</td>
             </tr>
         ";
         $purchases .= '</table><br/>';

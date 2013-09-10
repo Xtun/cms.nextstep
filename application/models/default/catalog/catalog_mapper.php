@@ -187,6 +187,8 @@ class Catalog_mapper extends MY_Model implements Mapper
       catalog_item.description,
       catalog_item.article,
       catalog_item.price,
+      catalog_item.discount_price,
+      catalog_item.discount_percent,
       catalog_item.section_id,
       catalog_item.priority,
       catalog_item.in_stock,
@@ -203,7 +205,11 @@ class Catalog_mapper extends MY_Model implements Mapper
     {
       $this->db->limit($limit);
     }
-    return $this->db->get()->result(self::CLASS_ITEM);
+    $tmp = $this->db->get()->result(self::CLASS_ITEM);
+    foreach ($tmp as $key => $tmp_item) {
+        $tmp[$key]->exist_discount_category();
+    }
+    return $tmp;
   }
 
   // получение списка доступных товаров
@@ -215,6 +221,8 @@ class Catalog_mapper extends MY_Model implements Mapper
       catalog_item.description,
       catalog_item.article,
       catalog_item.price,
+      catalog_item.discount_price,
+      catalog_item.discount_percent,
       catalog_item.section_id
     ');
     $this->db->from('catalog_item');
@@ -224,7 +232,11 @@ class Catalog_mapper extends MY_Model implements Mapper
     {
       $this->db->limit($limit);
     }
-    return $this->db->get()->result(self::CLASS_ITEM);
+    $tmp = $this->db->get()->result(self::CLASS_ITEM);
+    foreach ($tmp as $key => $tmp_item) {
+        $tmp[$key]->exist_discount_category();
+    }
+    return $tmp;
   }
 
   // получить список товаров в категории
@@ -232,21 +244,23 @@ class Catalog_mapper extends MY_Model implements Mapper
   {
     $this->db->distinct();
     $this->db->select('
-      catalog_item.id,
-      catalog_item.title,
-      catalog_item.description,
-      catalog_item.article,
-      catalog_item.price,
-      catalog_item.section_id,
+      catalog_item.*
     ');
     $this->db->from('catalog_item');
     $this->db->join('catalog_item_links', 'catalog_item_links.item_id = catalog_item.id');
     $this->db->join('catalog_category', 'catalog_category.id = catalog_item_links.category_id');
-    $this->db->where('catalog_category.id', $category_id);
-    $this->db->or_where('catalog_category.parent_category_id', $category_id);
     $this->db->where('catalog_category.is_deleted', 0);
     $this->db->where('catalog_item.is_deleted', 0);
-    return $this->db->get()->result(self::CLASS_ITEM);
+
+    // $this->db->where('catalog_category.id', $category_id);
+    // $this->db->or_where('catalog_category.parent_category_id', $category_id);
+    $this->db->where("(`catalog_category`.`id` = '{$category_id}' OR `catalog_category`.`parent_category_id` = '{$category_id}')");
+
+    $tmp = $this->db->get()->result(self::CLASS_ITEM);
+    foreach ($tmp as $key => $tmp_item) {
+        $tmp[$key]->exist_discount_category();
+    }
+    return $tmp;
   }
 
   public function get_bestsellers ( $order_title = 'priority', $order_type = 'ASC', $limit = 0 )
@@ -290,12 +304,18 @@ class Catalog_mapper extends MY_Model implements Mapper
       catalog_item.title,
       catalog_item.description,
       catalog_item.article,
+      catalog_item.discount_price,
+      catalog_item.discount_percent,
       catalog_item.price
     ');
     $this->db->from(self::TABLE_CATALOG_SIMILAR_ITEMS);
     $this->db->join('catalog_item', 'catalog_item.id = catalog_similar_items.sim_item_id');
     $this->db->where('catalog_similar_items.item_id', $item_id);
-    return $this->db->get()->result(self::CLASS_ITEM);
+    $tmp = $this->db->get()->result(self::CLASS_ITEM);
+    foreach ($tmp as $key => $tmp_item) {
+        $tmp[$key]->exist_discount_category();
+    }
+    return $tmp;
   }
 
   // проверить похожий товар
@@ -408,7 +428,10 @@ class Catalog_mapper extends MY_Model implements Mapper
     $result = $this->db->get()->result($class);
     if ( ! empty($result) )
     {
-      return $result[0];
+        if ($object_type == 'item') {
+            $result[0]->exist_discount_category();
+        }
+        return $result[0];
     }
     return FALSE;
   }
@@ -901,7 +924,8 @@ class Catalog_mapper extends MY_Model implements Mapper
         $data = array (
           'id'    => $item->id,
           'qty'   => $quantity,
-          'price' => $item->price,
+          'price' => $item->get_discount_price(),
+          //'price' => $item->price,
           'name'  => $item->title,
           'options' => array (
               'article' => $item->article
@@ -1002,6 +1026,50 @@ class Catalog_mapper extends MY_Model implements Mapper
     $this->pagination->initialize($config);
     return $this->pagination->create_links();
   }
+
+  /* START saving discounts */
+  public function get_saving_discounts ()
+  {
+    $this->db
+      ->select('*')
+      ->from('catalog_discounts');
+    return $this->db->get()->result();
+  }
+
+  public function remove_saving_discounts ()
+  {
+    $this->db->empty_table('catalog_discounts');
+  }
+
+  public function set_saving_discounts ( $order_limit, $discount_price, $discount_percent )
+  {
+    if ( (count($order_limit) == count($discount_price)) && (count($order_limit) == count($discount_percent)) )
+    {
+      for ( $i = 0; $i < count($order_limit); $i++ )
+      {
+        if ( ($order_limit[$i] > 0) && (($discount_price[$i] > 0) || ($discount_percent[$i] > 0 && $discount_percent[$i] < 100)) )
+        {
+          $data = array (
+             'order_limit'      => $order_limit[$i],
+             'discount_price'   => $discount_price[$i],
+             'discount_percent' => $discount_percent[$i]
+          );
+          $this->db->insert('catalog_discounts', $data);
+        }
+      }
+    }
+  }
+
+  public function get_saving_discount ( $order_limit = 0 )
+  {
+    $this->db->select('*');
+    $this->db->from('catalog_discounts');
+    $this->db->where('order_limit <=', $order_limit);
+    $this->db->order_by('order_limit', 'desc');
+    $this->db->limit(1);
+    return $this->db->get()->row();
+  }
+  /* END saving discounts */
 
 
 

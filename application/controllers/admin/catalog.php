@@ -14,6 +14,8 @@ class Catalog extends Admin_Controller
 
     protected $page_list;
 
+    // catalog views
+    const VIEW_CATALOG_DISCOUNTS  = 'catalog/discounts';
     // section views
     const VIEW_CATALOG_INDEX  = 'catalog/section_index';
     const VIEW_SECTION_ADD    = 'catalog/section_add';
@@ -40,6 +42,7 @@ class Catalog extends Admin_Controller
 
         $this->_module['title'] = 'Торговый каталог';
 
+        $this->_templates['catalog_discounts'] = self::VIEW_CATALOG_DISCOUNTS;
         // section templates
         $this->_templates['section_index'] = self::VIEW_CATALOG_INDEX;
         $this->_templates['section_add']   = self::VIEW_SECTION_ADD;
@@ -56,7 +59,8 @@ class Catalog extends Admin_Controller
         $this->_templates['page_select_list']   = 'page_select_list';
         $this->_templates['page_select_item']   = 'page_select_item';
 
-        $this->_url['section_index'] = base_url() . 'admin/catalog';
+        $this->_url['section_index']     = base_url('admin/catalog');
+        $this->_url['catalog_discounts'] = base_url('admin/catalog/discounts');
 
         $this->_links['section_add'] = '/admin/catalog/section/add';
         $this->_links['category_add'] = '/admin/catalog/category/add';
@@ -104,6 +108,27 @@ class Catalog extends Admin_Controller
         $this->_template_data('catalog_section_list', $catalog_section_list);
         $this->_template_data('cart_settings', $cart_settings);
         $this->load->admin_view($this->_templates['section_index'], $this->template_data);
+    }
+
+    public function discounts ()
+    {
+        $this->template_data['module']['title'] = 'Управление скидками';
+
+        if ( !empty($_POST) )
+        {
+            $order_limit      = $this->input->post('order_limit');
+            $discount_price   = $this->input->post('discount_price');
+            $discount_percent = $this->input->post('discount_percent');
+            if ( !empty($order_limit) && !empty($discount_price) && !empty($discount_percent) )
+            {
+                $this->catalog_mapper->remove_saving_discounts();
+                $this->catalog_mapper->set_saving_discounts($order_limit, $discount_price, $discount_percent);
+            }
+        }
+        $discounts = $this->catalog_mapper->get_saving_discounts();
+
+        $this->_template_data('discounts', $discounts);
+        $this->load->admin_view($this->_templates['catalog_discounts'], $this->template_data);
     }
 
     private function _category_index ( $object_id = 0 )
@@ -287,6 +312,8 @@ class Catalog extends Admin_Controller
                 $category->parent_section_id  = $this->input->post('parent_section_id');
                 $category->title              = $this->input->post('title');
                 $category->priority           = $this->input->post('priority');
+                $category->discount_percent   = str_replace(',', '.', $this->input->post('discount-percent'));
+                $category->discount_price     = (int)$category->discount_percent > 0 ? 0 : str_replace(',', '.', $this->input->post('discount-price'));
                 $this->catalog_mapper->save($category);
 
                 $section = new Catalog_Section($parent_id);
@@ -316,7 +343,14 @@ class Catalog extends Admin_Controller
                 $item->article       = $this->input->post('article');
                 $item->priority      = $this->input->post('item_priority');
 
-                $item->price         = str_replace(',', '.', $this->input->post('price'));
+                $item->price            = str_replace(',', '.', $this->input->post('price'));
+                $item->discount_price   = str_replace(',', '.', $this->input->post('discount-price'));
+                $item->discount_percent = str_replace(',', '.', $this->input->post('discount-percent'));
+                if ($item->discount_percent > 0)
+                {
+                    $item->discount_price = 0;
+                }
+
                 $item->section_id    = $section_id;
                 $item->in_stock      = ( $this->input->post('in_stock') == 'on' ) ? 1 : 0;
                 $item->is_bestseller = ( $this->input->post('is_bestseller') == 'on' ) ? 1 : 0;
@@ -425,6 +459,8 @@ class Catalog extends Admin_Controller
                 $category->parent_section_id  = $this->input->post('parent_section_id');
                 $category->title              = $this->input->post('title');
                 $category->priority           = $this->input->post('priority');
+                $category->discount_percent   = str_replace(',', '.', $this->input->post('discount-percent'));
+                $category->discount_price     = (int)$category->discount_percent > 0 ? 0 : str_replace(',', '.', $this->input->post('discount-price'));
                 $this->catalog_mapper->save($category);
 
                 $section = new Catalog_Section($category->parent_section_id);
@@ -458,6 +494,13 @@ class Catalog extends Admin_Controller
                 $item->priority      = $this->input->post('item_priority');
 
                 $item->price         = str_replace(',', '.', $this->input->post('price'));
+                $item->discount_price   = str_replace(',', '.', $this->input->post('discount-price'));
+                $item->discount_percent = str_replace(',', '.', $this->input->post('discount-percent'));
+                if ($item->discount_percent > 0)
+                {
+                    $item->discount_price = 0;
+                }
+
                 $item->in_stock      = ( $this->input->post('in_stock') == 'on' ) ? 1 : 0;
                 $item->is_bestseller = ( $this->input->post('is_bestseller') == 'on' ) ? 1 : 0;
                 $item->is_sale       = ( $this->input->post('is_sale') == 'on' ) ? 1 : 0;

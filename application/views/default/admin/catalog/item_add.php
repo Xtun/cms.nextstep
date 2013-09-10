@@ -67,6 +67,14 @@
           <td><input class="styler" type="text" name="price" value='<?= set_value('price'); ?>' /></td>
         </tr>
         <tr>
+          <td class="admin_module_form_title">Скидка в рублях</td>
+          <td><input class="styler" type="text" name="discount-price" value='' /></td>
+        </tr>
+        <tr>
+          <td class="admin_module_form_title">Скидка в процентах (приоритетная)</td>
+          <td><input class="styler" type="text" name="discount-percent" value='' /></td>
+        </tr>
+        <tr>
           <td class="admin_module_form_title">Товар в наличии</td>
           <td>
             <input type="checkbox" name="in_stock" />

@@ -15,6 +15,11 @@
   $item->in_stock(TRUE)   = булево представление поля "Товар в наличии"
 */
 ?>
+<style type="text/css">
+  .old-price {
+      text-decoration: line-through;
+  }
+</style>
 
 <div class="padcontent">
   <div id="ts-display-products">
@@ -30,9 +35,14 @@
                 <?= $product->title; ?>
               </a>
             </h2>
-            <div class="price">
-              <?= $product->price(); ?>
-            </div>
+
+            <p class="price discount <?=$product->price_discount() !== $product->price() ? 'sale-price' : 'hidden-price' ?>">
+                <?= $product->price_discount() !== $product->price() ? $product->price_discount() : ''; ?>
+            </p>
+            <p class="price <?=$product->price_discount() !== $product->price() ? 'old-price' : '' ?>">
+                <?= $product->price(); ?>
+            </p>
+
           </li>
         <? endforeach; ?>
       <? endif; ?>

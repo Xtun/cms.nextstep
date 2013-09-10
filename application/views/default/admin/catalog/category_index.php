@@ -43,6 +43,16 @@
                     <span class="right priority" title="порядок">
                         <?= $category['item']->priority; ?>
                     </span>
+                    <? if ($category['item']->discount_price > 0) : ?>
+                        <span class="right" title="скидка">
+                            <strong>Скидка:</strong> <?= $category['item']->discount_price; ?>
+                        </span>
+                    <? endif; ?>
+                    <? if ($category['item']->discount_percent > 0) : ?>
+                        <span class="right" title="скидка %">
+                            <strong>Скидка %:</strong> <?= $category['item']->discount_percent; ?>
+                        </span>
+                    <? endif; ?>
                 </div>
                 <div class="clearfix">
                     <ul class="admin_list">
@@ -70,6 +80,16 @@
                                     <span class="right priority" title="порядок">
                                         <?= $subvalue->priority; ?>
                                     </span>
+                                    <? if ($subvalue->discount_price > 0) : ?>
+                                        <span class="right" title="скидка">
+                                            <strong>Скидка:</strong> <?= $subvalue->discount_price; ?>
+                                        </span>
+                                    <? endif; ?>
+                                    <? if ($subvalue->discount_percent > 0) : ?>
+                                        <span class="right" title="скидка %">
+                                            <strong>Скидка %:</strong> <?= $subvalue->discount_percent; ?>
+                                        </span>
+                                    <? endif; ?>
                                 </div>
                             </li>
                         <? endforeach; ?>
@@ -122,9 +142,32 @@
                     <span class="right priority" title="порядок">
                         <?= $item->priority; ?>
                     </span>
+
                     <span class="right" title="артикул">
-                        <?= $item->article; ?>
+                        <strong>Артикул:</strong> <?= $item->article; ?>
                     </span>
+                    <? if ($item->discount_price > 0) : ?>
+                        <span class="right" title="скидка">
+                            <strong>Скидка:</strong> <?= $item->discount_price; ?>
+                        </span>
+                    <? endif; ?>
+                    <? if ($item->discount_percent > 0) : ?>
+                        <span class="right" title="скидка %">
+                            <strong>Скидка %:</strong> <?= $item->discount_percent; ?>
+                        </span>
+                    <? endif;?>
+                    <span class="right">
+                        <strong>&nbsp;</strong>
+                    </span>
+                    <span class="right" title="цена">
+                        <strong>Цена:</strong> <?= $item->price; ?>
+                    </span>
+                    <? if ($item->discount_percent > 0 || $item->discount_price > 0) : ?>
+                        <span class="right" title="цена со скидкой">
+                            <strong>Цена со скидкой:</strong> <?= $item->get_discount_price(); ?>
+                        </span>
+                    <? endif; ?>
+
                 </div>
             </li>
         <? endforeach; ?>
