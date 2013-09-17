@@ -61,6 +61,7 @@ class User_mapper extends MY_Model {
         if ( $client = $this->is_client() )
         {
             $template_data['order_list'] = $this->cart_mapper->get_client_orders($client->id);
+            $template_data['user_info']  = $client;
             $template = $this->_cabinet;
             return $this->load->site_view($template, $template_data, TRUE);
         }

@@ -2,22 +2,23 @@
 
 class Catalog_mapper extends MY_Model implements Mapper
 {
-  // table constants
-  const TABLE_CATALOG_SECTION       = 'catalog_section';
-  const TABLE_CATALOG_CATEGORY      = 'catalog_category';
-  const TABLE_CATALOG_CURRENCY      = 'catalog_currency';
-  const TABLE_CATALOG_ITEM          = 'catalog_item';
-  const TABLE_CATALOG_ITEM_IMAGES   = 'catalog_item_images';
-  const TABLE_CATALOG_ITEM_LINKS    = 'catalog_item_links';
-  const TABLE_CATALOG_USER_FIELDS   = 'catalog_user_fields';
-  const TABLE_CATALOG_USER_VALUES   = 'catalog_user_values';
-  const TABLE_CATALOG_SIMILAR_ITEMS = 'catalog_similar_items';
-  const TABLE_IMAGES                = 'images';
-  const TABLE_PAGES                 = 'pages';
-  // class for result object
-  const CLASS_SECTION  = 'Catalog_Section';
-  const CLASS_CATEGORY = 'Catalog_Category';
-  const CLASS_ITEM     = 'Catalog_Item';
+    // table constants
+    const TABLE_CATALOG_SECTION       = 'catalog_section';
+    const TABLE_CATALOG_CATEGORY      = 'catalog_category';
+    const TABLE_CATALOG_CURRENCY      = 'catalog_currency';
+    const TABLE_CATALOG_ITEM          = 'catalog_item';
+    const TABLE_CATALOG_ITEM_IMAGES   = 'catalog_item_images';
+    const TABLE_CATALOG_ITEM_LINKS    = 'catalog_item_links';
+    const TABLE_CATALOG_USER_FIELDS   = 'catalog_user_fields';
+    const TABLE_CATALOG_USER_VALUES   = 'catalog_user_values';
+    const TABLE_CATALOG_SIMILAR_ITEMS = 'catalog_similar_items';
+    const TABLE_IMAGES                = 'images';
+    const TABLE_PAGES                 = 'pages';
+
+    // class for result object
+    const CLASS_SECTION               = 'Catalog_Section';
+    const CLASS_CATEGORY              = 'Catalog_Category';
+    const CLASS_ITEM                  = 'Catalog_Item';
 
   public function  __construct ()
   {
@@ -549,112 +550,112 @@ class Catalog_mapper extends MY_Model implements Mapper
     }
   }
 
-  // получить список пользовательских полей
-  public function get_uf_list ( $section_id )
-  {
-    $this->db->select('*');
-    $this->db->from(self::TABLE_CATALOG_USER_FIELDS);
-    $this->db->where('section_id', $section_id);
-    $this->db->where('is_deleted', 0);
-    return $this->db->get()->result_array();
-  }
-
-  // получить список значений пользовательских полей
-  public function get_uf_values ( $section_id, $item_id )
-  {
-    $this->db->select('*');
-    $this->db->from(self::TABLE_CATALOG_USER_VALUES);
-    $this->db->join('catalog_user_fields', 'catalog_user_values.user_field_id = catalog_user_fields.id');
-    $this->db->where('catalog_user_fields.is_deleted', 0);
-    $this->db->where('catalog_user_fields.section_id', $section_id);
-    $this->db->where('catalog_user_values.item_id', $item_id);
-    return $this->db->get()->result_array();
-  }
-
-  // добавление значений пользовательских полей
-  public function set_uf_values ( $item_id, $uf_values, $uf_ids, $uf_types )
-  {
-    for ( $i = 0; $i < count($uf_values); $i++ )
+    // получить список пользовательских полей
+    public function get_uf_list ( $section_id )
     {
-      if ( $uf_values[$i] )
-      {
-        switch ( $uf_types[$i] )
-        {
-          case 1:
-            $data['value_int'] = (int) $uf_values[$i];
-            break;
-          case 2:
-            $data['value_float'] = (float) $uf_values[$i];
-            break;
-          case 3:
-            $data['value_string'] = (string) $uf_values[$i];
-            break;
-          case 4:
-            $data['value_text'] = trim($uf_values[$i]);
-            break;
-          case 5:
-            $data['value_date'] = date('Y-m-d H:i:s', strtotime($uf_values[$i]));
-            break;
-          default:
-            continue;
-            break;
-        }
-      } else {
-        $data['value_int']    = NULL;
-        $data['value_float']  = NULL;
-        $data['value_string'] = NULL;
-        $data['value_text']   = NULL;
-        $data['value_date']   = NULL;
-      }
-      $data['item_id']       = $item_id;
-      $data['user_field_id'] = $uf_ids[$i];
-      $this->db->insert(self::TABLE_CATALOG_USER_VALUES, $data);
+        $this->db->select('*');
+        $this->db->from(self::TABLE_CATALOG_USER_FIELDS);
+        $this->db->where('section_id', $section_id);
+        $this->db->where('is_deleted', 0);
+        return $this->db->get()->result_array();
     }
-  }
 
-  // обновление значений пользовательских полей
-  public function upd_uf_values ( $item_id, $uf_values, $uf_ids, $uf_types )
-  {
-    if ( count($uf_values) == count($uf_ids) )
+    // получить список значений пользовательских полей
+    public function get_uf_values ( $section_id, $item_id )
     {
-      for ( $i = 0; $i < count($uf_values); $i++ )
-      {
-        if ( $uf_values[$i] )
-        {
-          switch ( $uf_types[$i] )
-          {
-            case 1:
-              $data['value_int'] = (int) $uf_values[$i];
-              break;
-            case 2:
-              $data['value_float'] = (float) $uf_values[$i];
-              break;
-            case 3:
-              $data['value_string'] = (string) $uf_values[$i];
-              break;
-            case 4:
-              $data['value_text'] = trim($uf_values[$i]);
-              break;
-            case 5:
-              $data['value_date'] = date('Y-m-d H:i:s', strtotime($uf_values[$i]));
-              break;
-            default:
-              continue;
-              break;
-          }
-        } else {
-          $data['value_int']    = NULL;
-          $data['value_float']  = NULL;
-          $data['value_string'] = NULL;
-          $data['value_text']   = NULL;
-          $data['value_date']   = NULL;
-        }
-        $this->db->where('item_id', $item_id);
-        $this->db->where('user_field_id', $uf_ids[$i]);
-        $this->db->update(self::TABLE_CATALOG_USER_VALUES, $data);
-      }
+        $this->db->select('*');
+        $this->db->from(self::TABLE_CATALOG_USER_VALUES);
+        $this->db->join('catalog_user_fields', 'catalog_user_values.user_field_id = catalog_user_fields.id');
+        $this->db->where('catalog_user_fields.is_deleted', 0);
+        $this->db->where('catalog_user_fields.section_id', $section_id);
+        $this->db->where('catalog_user_values.item_id', $item_id);
+        return $this->db->get()->result_array();
     }
-  }
+
+    // добавление значений пользовательских полей
+    public function set_uf_values ( $item_id, $uf_values, $uf_ids, $uf_types )
+    {
+        for ( $i = 0; $i < count($uf_values); $i++ )
+        {
+            $data = array();
+            $data['value_int']    = NULL;
+            $data['value_float']  = NULL;
+            $data['value_string'] = NULL;
+            $data['value_text']   = NULL;
+            $data['value_date']   = NULL;
+            if ( $uf_values[$i] )
+            {
+                switch ( $uf_types[$i] )
+                {
+                    case 1:
+                        $data['value_int'] = (int) $uf_values[$i];
+                        break;
+                    case 2:
+                        $data['value_float'] = (float) $uf_values[$i];
+                        break;
+                    case 3:
+                        $data['value_string'] = (string) $uf_values[$i];
+                        break;
+                    case 4:
+                        $data['value_text'] = trim($uf_values[$i]);
+                        break;
+                    case 5:
+                        $data['value_date'] = date('Y-m-d H:i:s', strtotime($uf_values[$i]));
+                        break;
+                    default:
+                        continue;
+                        break;
+                }
+            }
+            $data['item_id']       = $item_id;
+            $data['user_field_id'] = $uf_ids[$i];
+            $this->db->insert(self::TABLE_CATALOG_USER_VALUES, $data);
+        }
+    }
+
+    // обновление значений пользовательских полей
+    public function upd_uf_values ( $item_id, $uf_values, $uf_ids, $uf_types )
+    {
+        if ( count($uf_values) == count($uf_ids) )
+        {
+            for ( $i = 0; $i < count($uf_values); $i++ )
+            {
+                $data = array();
+                $data['value_int']    = NULL;
+                $data['value_float']  = NULL;
+                $data['value_string'] = NULL;
+                $data['value_text']   = NULL;
+                $data['value_date']   = NULL;
+                if ( $uf_values[$i] )
+                {
+                    switch ( $uf_types[$i] )
+                    {
+                        case 1:
+                            $data['value_int'] = (int) $uf_values[$i];
+                            break;
+                        case 2:
+                            $data['value_float'] = (float) $uf_values[$i];
+                            break;
+                        case 3:
+                            $data['value_string'] = (string) $uf_values[$i];
+                            break;
+                        case 4:
+                            $data['value_text'] = trim($uf_values[$i]);
+                            break;
+                        case 5:
+                            $data['value_date'] = date('Y-m-d H:i:s', strtotime($uf_values[$i]));
+                            break;
+                        default:
+                            continue;
+                            break;
+                    }
+                }
+                $this->db->where('item_id', $item_id);
+                $this->db->where('user_field_id', $uf_ids[$i]);
+                $this->db->update(self::TABLE_CATALOG_USER_VALUES, $data);
+            }
+        }
+    }
 
   public function get_yml ( $model = FALSE, $vendor = 'NoName' )
   {
@@ -710,22 +711,37 @@ class Catalog_mapper extends MY_Model implements Mapper
     }
   }
 
-  // редактирование изображения
-  public function images_edit ( $item_id, $imgs_id )
-  {
-    if ( ! empty($imgs_id) )
+    // редактирование изображения
+    public function images_edit ( $item_id, $imgs_id )
     {
-      $data = array();
-      foreach ( $imgs_id as $image_id )
-      {
-        $data[] = array (
-          'item_id'  => $item_id,
-          'image_id' => $image_id
-        );
-      }
-      $this->db->insert_batch(self::TABLE_CATALOG_ITEM_IMAGES, $data);
+        if ( ! empty($imgs_id) )
+        {
+            $data = array();
+            foreach ( $imgs_id as $key => $image_id )
+            {
+                $data[] = array (
+                    'item_id'  => $item_id,
+                    'image_id' => $image_id
+                );
+            }
+            $this->db->insert_batch(self::TABLE_CATALOG_ITEM_IMAGES, $data);
+        }
     }
-  }
+
+    // установить самое первое изображение в качестве основного, если уже не установлено
+    public function set_first_main_img ( $item_id = 0 )
+    {
+        $cur_main_img = $this->get_main_image($item_id);
+        if ( empty($cur_main_img) )
+        {
+            $data['is_main'] = 1;
+
+            $this->db->where('item_id', $item_id);
+            $this->db->order_by('id', 'asc');
+            $this->db->limit(1);
+            $this->db->update(self::TABLE_CATALOG_ITEM_IMAGES, $data);
+        }
+    }
 
   private function reset_main_img ( $item_id )
   {

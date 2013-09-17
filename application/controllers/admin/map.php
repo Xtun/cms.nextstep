@@ -43,7 +43,7 @@ class Map extends Admin_Controller {
         $this->form_validation->set_message('required', 'Поле "%s" незаполнено');
         $this->form_validation->set_message('_check_url_exists', 'Такой %s уже существует');
         $this->form_validation->set_rules('title', 'название','trim|required');
-        $this->form_validation->set_rules('url', 'url','trim|required|callback__check_url_exists');
+        // $this->form_validation->set_rules('url', 'url','trim|required|callback__check_url_exists');
         $new_page            = new Page_item();
         $list_modules = $this->_manager_modules->get_list_module();
         if ( $this->form_validation->run() != FALSE ) {
@@ -76,6 +76,20 @@ class Map extends Admin_Controller {
             $new_page->show_alias  = ($this->input->post('show_alias') == 'on' ) ? 1 : 0;
             $new_page->template    = $this->input->post('template');
             $new_page->show        = ($this->input->post('show') == 'on' ) ? 1 : 0;
+            //--2.0--//
+            if ($new_page->url == NULL)
+            {
+                $new_page->url = $this->get_url_from_titles($new_page->title);
+            }
+            $data2 = $this->get_table($new_page->url);
+            while($data2 != NULL)
+            {
+                $pager = $new_page->url;
+                $new_page->url = $pager.'1';
+                $data2 = $this->get_table($new_page->url);
+            }
+            unset($data2);
+            //-----//
             $new_page_id = $this->_page_mapper->save_page($new_page);
             $modules     = isset($_POST['active_form']) && sizeof($_POST['active_form']) > 0 ? $_POST['active_form'] : '';
             $this->_manager_modules->set_page_module($new_page_id, $modules);
@@ -132,7 +146,7 @@ class Map extends Admin_Controller {
             $this->form_validation->set_message('required', 'Поле "%s" незаполнено');
             $this->form_validation->set_message('_check_url_exists', 'Такой %s уже существует');
             $this->form_validation->set_rules('title', 'название','trim|required');
-            $this->form_validation->set_rules('url', 'url','trim|required|callback__check_url_exists');
+            // $this->form_validation->set_rules('url', 'url','trim|required|callback__check_url_exists');
             if ($this->form_validation->run() != FALSE) {
                 $show      = !empty($_POST['show']) && $_POST['show'] == 'on' ? 1 : 0;
                 $parent_id  = !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : 0;
@@ -166,6 +180,18 @@ class Map extends Admin_Controller {
                 $edit_page->description = $this->input->post('description');
                 $edit_page->template    = $this->input->post('template');
                 $edit_page->show        = $show;
+                //--2.0--//
+                if($edit_page->url==NULL){
+                    $edit_page->url =$this->get_url_from_titles($edit_page->title);
+                }
+                $data2=$this->get_table($edit_page->url);
+                while($data2!=NULL){
+                    $pager=$edit_page->url;
+                    $edit_page->url=$pager.'1';
+                    $data2=$this->get_table($edit_page->url);
+                }
+                unset($data2);
+                //-----//
                 $this->_page_mapper->save_page($edit_page);
                 $this->_manager_modules->remove_page_module($edit_page->id);
                 $this->_manager_modules->set_page_module($edit_page->id, $modules);
@@ -255,4 +281,39 @@ class Map extends Admin_Controller {
         );
         echo stripslashes(json_encode($array));
     }
+
+    //--2.0--//
+    protected function get_url_from_titles($str) {
+        $tr = array(
+            "А"=>"a","Б"=>"b","В"=>"v","Г"=>"g",
+            "Д"=>"d","Е"=>"e","Ж"=>"j","З"=>"z","И"=>"i",
+            "Й"=>"y","К"=>"k","Л"=>"l","М"=>"m","Н"=>"n",
+            "О"=>"o","П"=>"p","Р"=>"r","С"=>"s","Т"=>"t",
+            "У"=>"u","Ф"=>"f","Х"=>"h","Ц"=>"ts","Ч"=>"ch",
+            "Ш"=>"sh","Щ"=>"sch","Ъ"=>"","Ы"=>"yi","Ь"=>"",
+            "Э"=>"e","Ю"=>"yu","Я"=>"ya","а"=>"a","б"=>"b",
+            "в"=>"v","г"=>"g","д"=>"d","е"=>"e","ж"=>"j",
+            "з"=>"z","и"=>"i","й"=>"y","к"=>"k","л"=>"l",
+            "м"=>"m","н"=>"n","о"=>"o","п"=>"p","р"=>"r",
+            "с"=>"s","т"=>"t","у"=>"u","ф"=>"f","х"=>"h",
+            "ц"=>"ts","ч"=>"ch","ш"=>"sh","щ"=>"sch","ъ"=>"y",
+            "ы"=>"yi","ь"=>"","э"=>"e","ю"=>"yu","я"=>"ya",
+            " "=>"_", ":"=>"_", ","=>"_", "."=>"_", ";"=>"_",
+            "!"=>"_","A"=>"a","B"=>"b","C"=>"c","D"=>"d",
+            "E"=>"e","F"=>"f","G"=>"g","H"=>"h","I"=>"i",
+            "J"=>"j","K"=>"k","L"=>"l","M"=>"m","N"=>"n",
+            "O"=>"o","P"=>"p","Q"=>"q","R"=>"r","S"=>"s",
+            "T"=>"t","U"=>"u","V"=>"v","W"=>"w","X"=>"x",
+            "Y"=>"y","Z"=>"z",
+        );
+        return strtr($str,$tr);
+    }
+
+    protected function get_table($url) {
+        $this->db->select('url');
+        $this->db->from('pages');
+        $this->db->where('url =',$url);
+        return $this->db->get()->row_array();
+    }
+
 }

@@ -202,7 +202,8 @@ class Catalog extends Admin_Controller
     public function imgdel ( $item_id = 0, $image_id = 0 )
     {
         $this->catalog_mapper->image_delete($item_id, $image_id);
-        redirect($this->_url['section_index']);
+        $this->catalog_mapper->set_first_main_img($item_id);
+        redirect($this->input->server('HTTP_REFERER'));
     }
 
     public function items ( $request_type = 'none', $object_id = 0, $optional = '' )
@@ -532,6 +533,8 @@ class Catalog extends Admin_Controller
                 $main_img     = $this->input->post('is_main');
                 $this->catalog_mapper->images_save($item->id, $cur_imgs, $cur_priority, $main_img);
 
+                $this->catalog_mapper->set_first_main_img($item->id);
+
                 // links
                 $parent_category_list = $this->input->post('parent_category_id');
                 if ( ! $parent_category_list )
@@ -557,26 +560,26 @@ class Catalog extends Admin_Controller
                 redirect(base_url($section->link('cat_list')));
             }
         }
-        $item = $this->catalog_mapper->get_object($object_id, 'item');
-        $item_links = $this->catalog_mapper->get_item_links($item->id);
-        $item_images = $this->catalog_mapper->get_item_images($item->id);
-        $section = new Catalog_Section($item->section_id);
+        $item          = $this->catalog_mapper->get_object($object_id, 'item');
+        $section       = new Catalog_Section($item->section_id);
+        $section_list  = $this->catalog_mapper->get_section_list();
         $category_list = $this->catalog_mapper->get_section_category_tree($section->id);
-        $user_values = $this->catalog_mapper->get_uf_values($section->id, $item->id);
-        $user_fields = $this->catalog_mapper->get_uf_list($section->id);
-
-        $section_list = $this->catalog_mapper->get_section_list();
-        $this->_template_data('section_list', $section_list);
+        $item_links    = $this->catalog_mapper->get_item_links($item->id);
+        $item_images   = $this->catalog_mapper->get_item_images($item->id);
+        $user_values   = $this->catalog_mapper->get_uf_values($section->id, $item->id);
+        $user_fields   = $this->catalog_mapper->get_uf_list($section->id);
         $similar_items = $this->catalog_mapper->get_similar_items($item->id);
-        $this->_template_data('similar_items', $similar_items);
 
-        $this->_template_data('user_values', $user_values);
-        $this->_template_data('user_fields', $user_fields);
         $this->_template_data('item', $item);
+        $this->_template_data('section', $section);
+        $this->_template_data('section_list', $section_list);
+        $this->_template_data('category_list', $category_list);
         $this->_template_data('item_links', $item_links);
         $this->_template_data('item_images', $item_images);
-        $this->_template_data('section', $section);
-        $this->_template_data('category_list', $category_list);
+        $this->_template_data('user_values', $user_values);
+        $this->_template_data('user_fields', $user_fields);
+        $this->_template_data('similar_items', $similar_items);
+
         $this->load->admin_view($this->_templates['item_edit'], $this->template_data);
     }
 

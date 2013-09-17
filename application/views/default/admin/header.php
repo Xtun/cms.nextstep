@@ -34,6 +34,9 @@
     <div id="nav-slider">
         <div class="inner">
             <ul>
+                <li style="float: left;" title="просмотр сайта (в новом окне)">
+                    <a href="<?= base_url(); ?>" target="_blank">сайт</a>
+                </li>
                 <? foreach ( $menu as $href => $title ) : ?>
                     <li>
                         <a href="<?= base_url($href); ?>">

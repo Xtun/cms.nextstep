@@ -46,12 +46,11 @@ class Content extends MY_Controller {
     }
 
     public function error404() {
-        $this->_dispatch('/content/error404');
+        $this->_dispatch('content/error404');
     }
 
     protected function send_output ( $content_type = 'text/html', $data = '' )
     {
-        ob_clean();
         $this->output
             ->set_content_type($content_type)
             ->set_output($data);
