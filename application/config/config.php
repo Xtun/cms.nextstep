@@ -38,7 +38,7 @@ $config['directory_trigger']    = 'd'; // experimental not currently in use
 $config['log_threshold']        = 1;
 
 // Error Logging Directory Path
-$config['log_path']             = '';
+$config['log_path']             = APP_LOGS_PATH;
 
 // Date Format for Logs
 $config['log_date_format']      = 'd.m.Y H:i:s';
@@ -65,7 +65,7 @@ $config['cookie_domain']        = '';
 $config['cookie_path']          = '/';
 
 // Global XSS Filtering
-$config['global_xss_filtering'] = FALSE;
+$config['global_xss_filtering'] = TRUE;
 
 // Output Compression
 $config['compress_output']      = FALSE;

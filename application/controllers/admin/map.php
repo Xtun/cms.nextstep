@@ -38,14 +38,15 @@ class Map extends Admin_Controller {
     }
 
     public function add() {
-        $this->scripts[] = '/js/admin/ui/jquery-ui-1.8.16.custom.min.js';
         $this->form_validation->set_error_delimiters('', '<br/>');
         $this->form_validation->set_message('required', 'Поле "%s" незаполнено');
         $this->form_validation->set_message('_check_url_exists', 'Такой %s уже существует');
         $this->form_validation->set_rules('title', 'название','trim|required');
-        // $this->form_validation->set_rules('url', 'url','trim|required|callback__check_url_exists');
-        $new_page            = new Page_item();
+        $this->form_validation->set_rules('url', 'url','trim|callback__check_url_exists');
+
+        $new_page     = new Page_item();
         $list_modules = $this->_manager_modules->get_list_module();
+
         if ( $this->form_validation->run() != FALSE ) {
             if (!empty($_FILES) && !empty($_FILES['image_bottom']) && $_FILES['image_bottom']['error'] == 0) {
                  $new_image = new Image_item();
@@ -64,7 +65,6 @@ class Map extends Admin_Controller {
                  unset($new_image);
             }
             $new_page->parent_id   = $this->input->post('parent_id');
-            $new_page->url         = $this->input->post('url');
             $new_page->image_link  = $this->input->post('image_link');
             $new_page->priority    = $this->input->post('priority');
             $new_page->meta        = $this->input->post('meta');
@@ -76,20 +76,27 @@ class Map extends Admin_Controller {
             $new_page->show_alias  = ($this->input->post('show_alias') == 'on' ) ? 1 : 0;
             $new_page->template    = $this->input->post('template');
             $new_page->show        = ($this->input->post('show') == 'on' ) ? 1 : 0;
-            //--2.0--//
-            if ($new_page->url == NULL)
+
+            // url transliterate
+            if ( FALSE !== ($url = $this->input->post('url')) )
             {
-                $new_page->url = $this->get_url_from_titles($new_page->title);
+                $new_url = $this->get_url_from_titles($new_page->title);
+                while ( ! $this->_check_url_exists($new_url) )
+                {
+                    $sep_pos = mb_strrpos($new_url, '_copy');
+                    if ( $sep_pos )
+                    {
+                        $count = (int) mb_substr($new_url, $sep_pos + mb_strlen('_copy'));
+                        $count++;
+                        $new_url = mb_substr($new_url, 0, $sep_pos).'_copy'.$count;
+                    } else {
+                        $new_url = $new_url.'_copy1';
+                    }
+                }
+                $url = $new_url;
             }
-            $data2 = $this->get_table($new_page->url);
-            while($data2 != NULL)
-            {
-                $pager = $new_page->url;
-                $new_page->url = $pager.'1';
-                $data2 = $this->get_table($new_page->url);
-            }
-            unset($data2);
-            //-----//
+            $new_page->url = $url;
+
             $new_page_id = $this->_page_mapper->save_page($new_page);
             $modules     = isset($_POST['active_form']) && sizeof($_POST['active_form']) > 0 ? $_POST['active_form'] : '';
             $this->_manager_modules->set_page_module($new_page_id, $modules);
@@ -106,7 +113,6 @@ class Map extends Admin_Controller {
     }
 
     public function edit($id = 0) {
-        $this->scripts[] = '/js/admin/ui/jquery-ui-1.8.16.custom.min.js';
         $id = (int) $id;
         if ( $id == 0 ) {
             redirect(base_url('admin/map'));
@@ -146,7 +152,7 @@ class Map extends Admin_Controller {
             $this->form_validation->set_message('required', 'Поле "%s" незаполнено');
             $this->form_validation->set_message('_check_url_exists', 'Такой %s уже существует');
             $this->form_validation->set_rules('title', 'название','trim|required');
-            // $this->form_validation->set_rules('url', 'url','trim|required|callback__check_url_exists');
+            $this->form_validation->set_rules('url', 'url','trim|callback__check_url_exists');
             if ($this->form_validation->run() != FALSE) {
                 $show      = !empty($_POST['show']) && $_POST['show'] == 'on' ? 1 : 0;
                 $parent_id  = !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : 0;
@@ -173,25 +179,33 @@ class Map extends Admin_Controller {
                 $edit_page->show_title  = $this->input->post('show_title') == 'on' ? 1 : 0;
                 $edit_page->alias       = $this->input->post('alias');
                 $edit_page->show_alias  = $this->input->post('show_alias') == 'on' ? 1 : 0;
-                $edit_page->url         = $this->input->post('url');
                 $edit_page->image_link  = $this->input->post('image_link');
                 $edit_page->meta        = $this->input->post('meta');
                 $edit_page->keywords    = $this->input->post('keywords');
                 $edit_page->description = $this->input->post('description');
                 $edit_page->template    = $this->input->post('template');
                 $edit_page->show        = $show;
-                //--2.0--//
-                if($edit_page->url==NULL){
-                    $edit_page->url =$this->get_url_from_titles($edit_page->title);
+
+                // url transliterate
+                if ( FALSE !== ($url = $this->input->post('url')) )
+                {
+                    $new_url = $this->get_url_from_titles($edit_page->title);
+                    while ( ! $this->_check_url_exists($new_url) )
+                    {
+                        $sep_pos = mb_strrpos($new_url, '_copy');
+                        if ( $sep_pos )
+                        {
+                            $count = (int) mb_substr($new_url, $sep_pos + mb_strlen('_copy'));
+                            $count++;
+                            $new_url = mb_substr($new_url, 0, $sep_pos).'_copy'.$count;
+                        } else {
+                            $new_url = $new_url.'_copy1';
+                        }
+                    }
+                    $url = $new_url;
                 }
-                $data2=$this->get_table($edit_page->url);
-                while($data2!=NULL){
-                    $pager=$edit_page->url;
-                    $edit_page->url=$pager.'1';
-                    $data2=$this->get_table($edit_page->url);
-                }
-                unset($data2);
-                //-----//
+                $edit_page->url = $url;
+
                 $this->_page_mapper->save_page($edit_page);
                 $this->_manager_modules->remove_page_module($edit_page->id);
                 $this->_manager_modules->set_page_module($edit_page->id, $modules);

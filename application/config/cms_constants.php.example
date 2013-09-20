@@ -28,7 +28,7 @@ define('ENVIRONMENT', 'dev');
 define('DB_HOSTNAME', 'localhost');
 define('DB_USERNAME', 'root');
 define('DB_PASSWORD', 'Rb9Ls64');
-define('DB_DATABASE', 'nextstep.rg3.su');
+define('DB_DATABASE', 'YOUR_DB_NAME');
 
 define('DB_DBDRIVER', 'mysql');
 define('DB_DBPREFIX', '');
@@ -48,6 +48,7 @@ define('DB_STRICTON', FALSE);
 |--------------------------------------------------------------------------
 */
 
+define('APP_LOGS_PATH', APPPATH.'logs/');
 define('APP_VIEWS_PATH', APPPATH.'views/');
 define('APP_MODELS_PATH', APPPATH.'models/');
 define('APP_CONFIG_PATH', APPPATH.'config/');

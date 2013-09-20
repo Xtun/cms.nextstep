@@ -252,11 +252,8 @@ class Catalog_mapper extends MY_Model implements Mapper
     $this->db->join('catalog_category', 'catalog_category.id = catalog_item_links.category_id');
     $this->db->where('catalog_category.is_deleted', 0);
     $this->db->where('catalog_item.is_deleted', 0);
-
-    // $this->db->where('catalog_category.id', $category_id);
-    // $this->db->or_where('catalog_category.parent_category_id', $category_id);
     $this->db->where("(`catalog_category`.`id` = '{$category_id}' OR `catalog_category`.`parent_category_id` = '{$category_id}')");
-
+    $this->db->order_by($order_title, $order_type);
     $tmp = $this->db->get()->result(self::CLASS_ITEM);
     foreach ($tmp as $key => $tmp_item) {
         $tmp[$key]->exist_discount_category();
