@@ -78,7 +78,7 @@ class Map extends Admin_Controller {
             $new_page->show        = ($this->input->post('show') == 'on' ) ? 1 : 0;
 
             // url transliterate
-            if ( FALSE !== ($url = $this->input->post('url')) )
+            if ( ! ($url = $this->input->post('url')) )
             {
                 $new_url = $this->get_url_from_titles($new_page->title);
                 while ( ! $this->_check_url_exists($new_url) )
@@ -187,7 +187,7 @@ class Map extends Admin_Controller {
                 $edit_page->show        = $show;
 
                 // url transliterate
-                if ( FALSE !== ($url = $this->input->post('url')) )
+                if ( ! ($url = $this->input->post('url')) )
                 {
                     $new_url = $this->get_url_from_titles($edit_page->title);
                     while ( ! $this->_check_url_exists($new_url) )
@@ -321,13 +321,6 @@ class Map extends Admin_Controller {
             "Y"=>"y","Z"=>"z",
         );
         return strtr($str,$tr);
-    }
-
-    protected function get_table($url) {
-        $this->db->select('url');
-        $this->db->from('pages');
-        $this->db->where('url =',$url);
-        return $this->db->get()->row_array();
     }
 
 }
