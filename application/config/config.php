@@ -65,7 +65,7 @@ $config['cookie_domain']        = '';
 $config['cookie_path']          = '/';
 
 // Global XSS Filtering
-$config['global_xss_filtering'] = TRUE;
+$config['global_xss_filtering'] = FALSE;
 
 // Output Compression
 $config['compress_output']      = FALSE;
