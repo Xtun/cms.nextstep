@@ -135,6 +135,10 @@ class Gallery_mapper extends MY_Model implements Mapper {
     public function get_page_content($page_id = 0) {
         $page_id          = (int)$page_id;
         $offset           = (int)$this->input->get('per_page');;
+
+        $sql     = "select url from {$this->_table_page} where id = {$page_id}";
+        $page    = $this->db->query($sql)->row_array();
+
         $sql              = "SELECT id, script_type, count_per_page FROM {$this->_table} WHERE parent_id = {$page_id}";
         $gallery_category = $this->db->query($sql)->row_array();
         if (sizeof($gallery_category) == 0) {
@@ -145,7 +149,8 @@ class Gallery_mapper extends MY_Model implements Mapper {
         $count_all = $tmp['count'];
         unset($tmp);
 
-        $paginator = $this->_paginator($count_all, $gallery_category['count_per_page']);
+        // pagination create: [ $module_config = '', $base_url = '', $total_rows = 0, $per_page = 0 ]
+        $paginator = $this->pagination->create('pagination_gallery', $page['url'], $count_all, $gallery_category['count_per_page']);
 
 
         $sql = "select n.id, n.title, n.image_id, n.description, n.link, i.filename filename
@@ -233,23 +238,6 @@ class Gallery_mapper extends MY_Model implements Mapper {
             }
         }
         return false;
-    }
-
-    private function _paginator ( $total_rows, $per_page )
-    {
-        $full_url = site_url() . $_SERVER['REQUEST_URI'];
-        $full_url = explode('?', $full_url);
-        $full_url = $full_url[0];
-
-        // load catalog pagination config
-        $config = $this->config->item('pagination_gallery');
-        // setting preferences
-        $config['base_url']   = $full_url.'?';
-        $config['total_rows'] = $total_rows;
-        $config['per_page']   = $per_page;
-
-        $this->pagination->initialize($config);
-        return $this->pagination->create_links();
     }
 
 }

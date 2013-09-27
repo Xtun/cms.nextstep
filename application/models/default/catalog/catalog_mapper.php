@@ -1005,7 +1005,11 @@ class Catalog_mapper extends MY_Model implements Mapper
       $count_per_page = $section->count_per_page;
       $total_rows     = count($catalog_products);
 
-      $paginator        = $this->_paginator($total_rows, $count_per_page);
+      $section_url = $this->page_mapper->get_page($section->parent_page_id)->url;
+
+      // pagination create: [ $module_config = '', $base_url = '', $total_rows = 0, $per_page = 0 ]
+      $paginator = $this->pagination->create('pagination_catalog', $section_url, $total_rows, $count_per_page);
+
       $catalog_products = array_splice($catalog_products, (int) $this->input->get('per_page'), $count_per_page);
     }
 
@@ -1014,30 +1018,6 @@ class Catalog_mapper extends MY_Model implements Mapper
       'paginator'        => $paginator,
     );
     return $this->load->site_view($this->_template['show'], $data, true);
-  }
-
-  private function _paginator ( $total_rows, $per_page )
-  {
-    $full_url = site_url() . $_SERVER['REQUEST_URI'];
-    $full_url = explode('?', $full_url);
-    $full_url = $full_url[0];
-
-    if ( $cat = $this->input->get('cat') )
-    {
-      $cat_link = 'cat='.$cat;
-    } else {
-      $cat_link = '';
-    }
-
-    // load catalog pagination config
-    $config = $this->config->item('pagination_catalog');
-    // setting preferences
-    $config['base_url']   = $full_url.'?'.$cat_link;
-    $config['total_rows'] = $total_rows;
-    $config['per_page']   = $per_page;
-
-    $this->pagination->initialize($config);
-    return $this->pagination->create_links();
   }
 
   /* START saving discounts */

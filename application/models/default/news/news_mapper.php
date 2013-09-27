@@ -169,7 +169,8 @@ class News_mapper extends MY_Model implements Mapper {
             $count_all = $tmp['count'];
             unset($tmp);
 
-            $paginator = $this->_paginator($count_all, $news_category['count_per_page']);
+            // pagination create: [ $module_config = '', $base_url = '', $total_rows = 0, $per_page = 0 ]
+            $paginator = $this->pagination->create('pagination_news', $page['url'], $count_all, $news_category['count_per_page']);
 
             $sql            = "select n.id id, n.title title, n.anno anno, n.is_spec_link is_spec_link, n.spec_link spec_link, n.image_id image_id, n.inner_position inner_position, unix_timestamp(n.user_date) created, i.filename filename
                                 from {$this->_table_item} n
@@ -260,23 +261,6 @@ class News_mapper extends MY_Model implements Mapper {
             return $tmp_object;
         }
         return false;
-    }
-
-    private function _paginator ( $total_rows, $per_page )
-    {
-        $full_url = site_url() . $_SERVER['REQUEST_URI'];
-        $full_url = explode('?', $full_url);
-        $full_url = $full_url[0];
-
-        // load catalog pagination config
-        $config = $this->config->item('pagination_news');
-        // setting preferences
-        $config['base_url']   = $full_url.'?';
-        $config['total_rows'] = $total_rows;
-        $config['per_page']   = $per_page;
-
-        $this->pagination->initialize($config);
-        return $this->pagination->create_links();
     }
 
     public function search ( $search_query = '' )
