@@ -76,6 +76,7 @@ class Map extends Admin_Controller {
             $new_page->show_alias  = ($this->input->post('show_alias') == 'on' ) ? 1 : 0;
             $new_page->template    = $this->input->post('template');
             $new_page->show        = ($this->input->post('show') == 'on' ) ? 1 : 0;
+            $new_page->page_type   = $this->input->post('page_type');
 
             // url transliterate
             if ( ! ($url = $this->input->post('url')) )
@@ -138,6 +139,7 @@ class Map extends Admin_Controller {
         $data['keywords']      = $edit_page->keywords;
         $data['description']   = $edit_page->description;
         $data['show']          = $edit_page->show;
+        $data['page_type']     = $edit_page->page_type;
         $data['template']      = $edit_page->template;
         $data['path_to_image'] = $this->_page_mapper->get_path_to_image();
 
@@ -184,6 +186,7 @@ class Map extends Admin_Controller {
                 $edit_page->keywords    = $this->input->post('keywords');
                 $edit_page->description = $this->input->post('description');
                 $edit_page->template    = $this->input->post('template');
+                $edit_page->page_type   = $this->input->post('page_type');
                 $edit_page->show        = $show;
 
                 // url transliterate

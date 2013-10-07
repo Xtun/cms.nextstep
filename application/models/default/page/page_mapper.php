@@ -216,6 +216,7 @@ class Page_mapper extends MY_Model {
                     `alias`        = {$this->db->escape($object->alias)},
                     `show_alias`   = {$object->show_alias},
                     `template`     = {$this->db->escape($object->template)},
+                    `page_type`    = {$this->db->escape($object->page_type)},
                     `image_bottom` = {$object->image_bottom}
                 WHERE
                     `id`           = {$object->id}
@@ -252,6 +253,7 @@ class Page_mapper extends MY_Model {
                 `alias`        = {$this->db->escape($object->alias)},
                 `show_alias`   = {$object->show_alias},
                 `template`     = {$this->db->escape($object->template)},
+                `page_type`    = {$this->db->escape($object->page_type)},
                 `image_bottom` = {$object->image_bottom}
             ";
             if ( $this->db->query($sql) )
@@ -279,6 +281,7 @@ class Page_mapper extends MY_Model {
         $tmp_object->priority     = $data['priority'];
         $tmp_object->show         = $data['show'];
         $tmp_object->template     = $data['template'];
+        $tmp_object->page_type    = $data['page_type'];
         $tmp_object->image_bottom = $data['image_bottom'];
         return $tmp_object;
     }

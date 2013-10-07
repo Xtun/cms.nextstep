@@ -30,6 +30,7 @@ class Page_item extends MY_Model_Item {
 		$this->_info['image_bottom'] = 0;
 		$this->_info['alias']        = '';
 		$this->_info['show_alias']   = 0;
+		$this->_info['page_type']    = 0;
 
 		// данные из настройки сайта
 		$this->_info['logo']             = '';

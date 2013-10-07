@@ -21,7 +21,11 @@
                     </td>
                 </tr>
                 <tr><td class="admin_module_form_title">ключевые слова</td><td><input type="text" name="keywords" value='<?=$this->input->post('keywords');?>'/></td></tr>
-                <tr><td class="admin_module_form_title">описание</td><td><input type="text" name="description" value='<?=$this->input->post('description');?>'/></td></tr>
+                <tr>
+                    <td class="admin_module_form_title">описание</td>
+                    <td><input type="text" name="description" value='<?=$this->input->post('description');?>'/></td>
+                </tr>
+                <tr>
                     <td class="admin_module_form_title">родительская страница</td>
                     <td>
                         <select name="parent_id" class="page_select_list">
@@ -39,6 +43,17 @@
                                     <?= $tpl_title; ?>
                                 </option>
                             <? endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="admin_module_form_title">тип страницы</td>
+                    <td>
+                        <select name="page_type" class="page_select_list">
+                            <option value="0">не выбрано</option>
+                            <option value="1">новости</option>
+                            <option value="2">каталог</option>
+                            <option value="3">галерея</option>
                         </select>
                     </td>
                 </tr>

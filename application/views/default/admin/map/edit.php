@@ -43,6 +43,17 @@
                             </select>
                         </td>
                     </tr>
+                    <tr>
+                    <td class="admin_module_form_title">тип страницы</td>
+                    <td>
+                        <select name="page_type" class="page_select_list">
+                            <option value="0">не выбрано</option>
+                            <option value="1" <?= ( $data['page_type'] == 1 ) ? 'selected="selected"' : ''; ?>>новости</option>
+                            <option value="2" <?= ( $data['page_type'] == 2 ) ? 'selected="selected"' : ''; ?>>каталог</option>
+                            <option value="3" <?= ( $data['page_type'] == 3 ) ? 'selected="selected"' : ''; ?>>галерея</option>
+                        </select>
+                    </td>
+                </tr>
                     <tr><td class="admin_module_form_title">показывать</td><td><input type="checkbox" name="show" class="admin_module_form_checkbox styled" <?=!empty($data['show']) && $data['show'] == '1' ? 'checked' : '';?> /></td></tr>
                     <tr>
                         <td class="admin_module_form_title">модули</td>
