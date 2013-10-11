@@ -238,7 +238,6 @@ class News_mapper extends MY_Model implements Mapper {
             $tmp_object->resize_height            = !empty($data['resize_height'])              ? $data['resize_height']              : '';
             return $tmp_object;
         } elseif ($type == 'item') {
-            print_r(var_dump($data));
             $tmp_object                 = new News_item();
             $tmp_object->id             = $data['id'];
             $tmp_object->parent_id      = !empty($data['parent_id'])        ? $data['parent_id']        : '';
