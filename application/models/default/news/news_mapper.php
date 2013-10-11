@@ -253,11 +253,11 @@ class News_mapper extends MY_Model implements Mapper {
             $tmp_object->inner_position = !empty($data['inner_position'])   ? $data['inner_position']   : '';
             $tmp_object->created        = !empty($data['created'])          ? $data['created']          : '';
             $user_date                  = !empty($data['user_date'])        ? $data['user_date']        : 0;
-            $tmp_object->user_day       = date("d", strtotime($user_date));
-            $tmp_object->user_month     = date("m", strtotime($user_date));
-            $tmp_object->user_year      = date("Y", strtotime($user_date));
-            $tmp_object->user_hour      = date("H", strtotime($user_date));
-            $tmp_object->user_min       = date("i", strtotime($user_date));
+            $tmp_object->user_day       = date("d", $user_date);
+            $tmp_object->user_month     = date("m", $user_date);
+            $tmp_object->user_year      = date("Y", $user_date);
+            $tmp_object->user_hour      = date("H", $user_date);
+            $tmp_object->user_min       = date("i", $user_date);
             return $tmp_object;
         }
         return false;
