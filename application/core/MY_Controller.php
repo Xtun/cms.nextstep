@@ -82,28 +82,49 @@ class Admin_Controller extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+
+        // load user auth model
         $this->load->model('auth_model');
 
-        if ( ! $this->auth_model->is_auth() )
+        // check user auth
+        if ( ! ($this->_is_auth = $this->auth_model->is_auth()) )
         {
-            redirect (base_url('admin/auth/login'));
+            redirect(base_url('admin/auth'));
         }
-        $this->_is_auth = $this->auth_model->is_auth();
 
         // CSS
         $this->css[] = base_url('www_admin/css/style.css');
-        // JS
-        $this->scripts[] = base_url('www_admin/js/jquery-1.7.min.js');
-        // Plugins
-        $this->css[]     = base_url('plugins/jquery-ui/css/jquery-ui-1.9.2.custom.min.css');
-        $this->css[]     = base_url('plugins/formstyler/jquery.formstyler.css');
-        $this->scripts[] = base_url('plugins/jquery-ui/jquery-ui-1.9.2.custom.min.js');
-        $this->scripts[] = base_url('plugins/formstyler/jquery.formstyler.min.js');
-        $this->scripts[] = base_url('plugins/ckeditor/ckeditor.js');
 
+
+        /* Common JS */
+
+        // jQuery framework
+        $this->scripts[] = base_url('www_admin/js/jquery.min.js');
+        $this->scripts[] = base_url('www_admin/js/jquery-migrate.js');
+        // bootstrap Framework plugins
+        $this->scripts[] = base_url('plugins/bootstrap/js/bootstrap.min.js');
+        // top menu
+        $this->scripts[] = base_url('www_admin/js/jquery.fademenu.js');
+        // top mobile menu
+        $this->scripts[] = base_url('www_admin/js/selectnav.min.js');
+        // actual width/height of hidden DOM elements
+        $this->scripts[] = base_url('www_admin/js/jquery.actual.min.js');
+        // jquery easing animations
+        $this->scripts[] = base_url('www_admin/js/jquery.easing.1.3.min.js');
+        // power tooltips
+        $this->scripts[] = base_url('www_admin/js/lib/powertip/jquery.powertip-1.1.0.min.js');
+        // date library
+        $this->scripts[] = base_url('www_admin/js/moment.min.js');
+        // common functions
+        $this->scripts[] = base_url('www_admin/js/beoro_common.js');
+
+        // www_admin data
         $this->template_data['css']     = $this->css;
         $this->template_data['scripts'] = $this->scripts;
-        $this->template_data['menu']    = $this->config->item('admin_menu');
+        // modules menu
+        $this->template_data['menu'] = $this->config->item('admin_menu');
+        // admin variables
+        $this->template_data['admin']['copyright_year'] = date('Y', time());
     }
 
     protected function _get_pages_tree($map_array = array(), $list_tmp = '', $item_tmp = '', $active_id = 0, $params = array()) {

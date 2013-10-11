@@ -30,9 +30,9 @@ class Auth_Model extends MY_Model {
             return false;
         } else {
             $row = $query->row();
-            $user_data['id']   = $row->id;
-            $user_data['login']= $row->login;
-            $user_data['email']= $row->email;
+            $user_data['rg3user_id']    = $row->id;
+            $user_data['rg3user_login'] = $row->login;
+            $user_data['rg3user_email'] = $row->email;
             $this->session->set_userdata($user_data);
             return true;
         }
@@ -43,11 +43,18 @@ class Auth_Model extends MY_Model {
      * @return true, false
      */
     public function is_auth() {
-        if($this->session->userdata('login') === false) return false;
-        $email = $this->session->userdata('email');
+        if($this->session->userdata('rg3user_login') === false) return false;
+        $email = $this->session->userdata('rg3user_email');
         $users = $this->db->query("SELECT * FROM users WHERE active = 1 AND email='".$email."'" );
         if ($users->num_rows() > 0) return true;
         return false;
+    }
+
+    public function remove_auth ()
+    {
+        $this->session->unset_userdata('rg3user_id');
+        $this->session->unset_userdata('rg3user_login');
+        $this->session->unset_userdata('rg3user_email');
     }
 
     /*
@@ -79,10 +86,13 @@ class Auth_Model extends MY_Model {
      */
     public function new_pass($login, $hash, $newpass) {
         $user = $this->db->query( "SELECT *, UNIX_TIMESTAMP(forgettime) as unixtime FROM users WHERE login='".$login."'" )->row();
-        $code = sha1(md5($user->email.$user->salt.$user->forgettime));
-        if ($code == $hash && time() >= $user->unixtime && time() <= ($user->unixtime + $this->delta_time)) {
-            $this->db->query( "UPDATE users SET password = '".md5($newpass)."', salt = 0, forgettime = '0000-00-00'  WHERE login='".$login."'" );
-            return true;
+        if ( $user )
+        {
+            $code = sha1(md5($user->email.$user->salt.$user->forgettime));
+            if ($code == $hash && time() >= $user->unixtime && time() <= ($user->unixtime + $this->delta_time)) {
+                $this->db->query( "UPDATE users SET password = '".md5($newpass)."', salt = 0, forgettime = '0000-00-00'  WHERE login='".$login."'" );
+                return true;
+            }
         }
         return false;
     }
@@ -94,9 +104,12 @@ class Auth_Model extends MY_Model {
      */
     public function is_hash_pass ($login, $hash) {
         $user = $this->db->query("SELECT *, UNIX_TIMESTAMP(forgettime) as unixtime FROM users WHERE login='".$login."'")->row();
-        $code = sha1(md5($user->email.$user->salt.$user->forgettime));
-        if ($code == $hash && time() >= $user->unixtime && time() <= ($user->unixtime + $this->delta_time)) {
-            return true;
+        if ( $user )
+        {
+            $code = sha1(md5($user->email.$user->salt.$user->forgettime));
+            if ($code == $hash && time() >= $user->unixtime && time() <= ($user->unixtime + $this->delta_time)) {
+                return true;
+            }
         }
         return false;
     }

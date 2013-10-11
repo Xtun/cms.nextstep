@@ -14,19 +14,7 @@
         <link rel="stylesheet" href="<?=$css_item;?>" type="text/css" media="screen" />
     <? endforeach;?>
     <? endif;?>
-    <? if (!empty($scripts)) :?>
-    <? foreach ($scripts as $script) :?>
-        <script type="text/javascript" src="<?=$script?>"></script>
-    <? endforeach;?>
-    <? endif;?>
 
-    <script>
-        (function($) {
-            $(function() {
-                $('input, select').styler();
-            })
-        })(jQuery)
-    </script>
 
 </head>
 <body id="to_top">

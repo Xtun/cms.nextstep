@@ -3,9 +3,14 @@
 class MY_Loader extends CI_Loader
 {
 
+    protected $custom_theme_path;
+    protected $default_theme_path;
+
     public function __construct()
     {
         parent::__construct();
+        $this->custom_theme_path  = APP_VIEWS_PATH.THEME_CUSTOM_VIEWS_PATH.'/';
+        $this->default_theme_path = APP_VIEWS_PATH.THEME_DEFAULT_VIEWS_PATH.'/';
     }
 
     public function model ( $model, $name = '', $db_conn = FALSE )
@@ -33,59 +38,20 @@ class MY_Loader extends CI_Loader
 
     public function view ( $view, $vars = array(), $return = FALSE, $full = TRUE )
     {
-        $custom_theme_path  = APP_VIEWS_PATH.THEME_CUSTOM_VIEWS_PATH.'/';
-        $default_theme_path = APP_VIEWS_PATH.THEME_DEFAULT_VIEWS_PATH.'/';
-
-        if ( ! $return )
+        if ( !$return && $full )
         {
-            $header = 'header';
-            $footer = 'footer';
+            $view_obj = new stdClass();
+            $view_obj->name     = $view;
+            $view_obj->type     = reset(explode('/', $view));
+            $view_obj->basename = basename($view);
+            $view_obj->dirname  = dirname($view);
 
-            $view_type = reset(explode('/', $view));
-
-            // .../application/views/CUSTOM_THEME/VIEW_TYPE/VIEW_header.php
-            if ( file_exists($custom_theme_path) && file_exists($custom_theme_path.$view.'_header.php') )
-            {
-                $header = THEME_CUSTOM_VIEWS_PATH.'/'.$view.'_header';
-            }
-            // .../application/views/CUSTOM_THEME/VIEW_TYPE/header.php
-            else if ( file_exists($custom_theme_path) && file_exists($custom_theme_path.$view_type.'/'.$header.EXT) )
-            {
-                $header = THEME_CUSTOM_VIEWS_PATH.'/'.$view_type.'/'.$header;
-            }
-            // .../application/views/DEFAULT_THEME/VIEW_TYPE/VIEW_header.php
-            else if ( file_exists($default_theme_path) && file_exists($default_theme_path.$view.'_header.php') )
-            {
-                $header = THEME_DEFAULT_VIEWS_PATH.'/'.$view.'_header';
-            }
-            // .../application/views/DEFAULT_THEME/VIEW_TYPE/header.php
-            else
-            {
-                $header = THEME_DEFAULT_VIEWS_PATH.'/'.$view_type.'/'.$header;
-            }
-
-            // footer view template
-            if ( file_exists($custom_theme_path) && file_exists($custom_theme_path.$view.'_footer.php') )
-            {
-                $footer = THEME_CUSTOM_VIEWS_PATH.'/'.$view.'_footer';
-            }
-            else if ( file_exists($custom_theme_path) && file_exists($custom_theme_path.$view_type.'/'.$footer.EXT) )
-            {
-                $footer = THEME_CUSTOM_VIEWS_PATH.'/'.$view_type.'/'.$footer;
-            }
-            else if ( file_exists($default_theme_path) && file_exists($default_theme_path.$view.'_footer.php') )
-            {
-                $footer = THEME_DEFAULT_VIEWS_PATH.'/'.$view.'_footer';
-            }
-            else
-            {
-                $footer = THEME_DEFAULT_VIEWS_PATH.'/'.$view_type.'/'.$footer;
-            }
-
+            $header = $this->_get_segment($view_obj, 'header');
+            $footer = $this->_get_segment($view_obj, 'footer');
         }
 
         // view template
-        if ( file_exists($custom_theme_path) && file_exists($custom_theme_path.$view.EXT) )
+        if ( file_exists($this->custom_theme_path) && file_exists($this->custom_theme_path.$view.EXT) )
         {
             $view = THEME_CUSTOM_VIEWS_PATH.'/'.$view;
         } else {
@@ -129,14 +95,11 @@ class MY_Loader extends CI_Loader
 
     public function widgets ()
     {
-        $custom_theme_path  = APP_VIEWS_PATH.THEME_CUSTOM_VIEWS_PATH.'/';
-        $default_theme_path = APP_VIEWS_PATH.THEME_DEFAULT_VIEWS_PATH.'/';
-
-        if ( file_exists($custom_theme_path) && file_exists($custom_theme_path.WIDGETS_FILE_NAME.EXT) )
+        if ( file_exists($this->custom_theme_path) && file_exists($this->custom_theme_path.WIDGETS_FILE_NAME.EXT) )
         {
-            $widgets_path = $custom_theme_path.WIDGETS_FILE_NAME.EXT;
+            $widgets_path = $this->custom_theme_path.WIDGETS_FILE_NAME.EXT;
         } else {
-            $widgets_path = $default_theme_path.WIDGETS_FILE_NAME.EXT;
+            $widgets_path = $this->default_theme_path.WIDGETS_FILE_NAME.EXT;
         }
 
         if ( file_exists($widgets_path) )
@@ -152,6 +115,65 @@ class MY_Loader extends CI_Loader
         $vars['data'] = $data;
 
         return $this->view('widgets/'.$view, $vars, TRUE, FALSE);
+    }
+
+    protected function _load_segment ( $theme_name = '', $theme_path = '', $view = NULL, $segment = '' )
+    {
+        if ( $theme_name && $theme_path && $view && $segment )
+        {
+            if ( file_exists($theme_path) )
+            {
+                /*
+                    Segment (header|footer) template view loading priority
+
+                    THEME: CUSTOM -> DEFAULT -> NO
+                    /application/views/{THEME}/{TYPE}/{VIEW}/{view_segment}.php
+                    /application/views/{THEME}/{TYPE}/{VIEW}/segment.php
+                    /application/views/{THEME}/{TYPE}/{view_segment}.php
+                    /application/views/{THEME}/{TYPE}/segment.php
+                */
+                if ( ($seg_path = "{$view->name}_{$segment}" ) && file_exists($theme_path.$seg_path.EXT) )
+                {
+                    $segment_full_path = "{$theme_name}/{$seg_path}";
+                }
+                elseif ( ($seg_path = "{$view->dirname}/{$segment}") && file_exists($theme_path.$seg_path.EXT) )
+                {
+                    $segment_full_path = "{$theme_name}/{$seg_path}";
+                }
+                elseif ( ($seg_path = "{$view->type}/{$view->basename}_{$segment}") && file_exists($theme_path.$seg_path.EXT) )
+                {
+                    $segment_full_path = "{$theme_name}/{$seg_path}";
+                }
+                elseif ( ($seg_path = "{$view->type}/{$segment}") && file_exists($theme_path.$seg_path.EXT) )
+                {
+                    $segment_full_path = "{$theme_name}/{$seg_path}";
+                }
+                else
+                {
+                    $segment_full_path = FALSE;
+                }
+                return $segment_full_path;
+            }
+        }
+        return FALSE;
+    }
+
+    protected function _get_segment ( $view = NULL, $segment = '' )
+    {
+        // CUSTOM view template
+        $result = $this->_load_segment(THEME_CUSTOM_VIEWS_PATH, $this->custom_theme_path, $view, $segment);
+        if ( ! $result )
+        {
+            // DEFAULT view template
+            $result = $this->_load_segment(THEME_DEFAULT_VIEWS_PATH, $this->default_theme_path, $view, $segment);
+            if ( ! $result )
+            {
+                // NO view
+                $result = FALSE;
+                show_error("Loader: {$segment} segment view loading error.");
+            }
+        }
+        return $result;
     }
 
 }
