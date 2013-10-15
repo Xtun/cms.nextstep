@@ -11,8 +11,15 @@
 
     <!-- Common JS -->
     <? if ( isset($scripts) ) : ?>
-        <? foreach ( $scripts as $script ) : ?>
-            <script src="<?= $script; ?>"></script>
+        <? foreach ( $scripts as $script_src ) : ?>
+            <script src="<?= $script_src; ?>"></script>
+        <? endforeach; ?>
+    <? endif; ?>
+
+    <!-- Additional JS -->
+    <? if ( isset($add_scripts) ) : ?>
+        <? foreach ( $add_scripts as $script_src ) : ?>
+            <script src="<?= $script_src; ?>"></script>
         <? endforeach; ?>
     <? endif; ?>
 

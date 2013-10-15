@@ -7,15 +7,31 @@ class Text extends Admin_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->library('form_validation');
+
         $this->_module_title                  = 'текстовый блок';
         $this->_templates['index']            = 'text/index';
         $this->_templates['add']              = 'text/add';
         $this->_templates['edit']             = 'text/edit';
+
         $this->_templates['page_select_list'] = 'page_select_list';
         $this->_templates['page_select_item'] = 'page_select_item';
 
         $this->template_data['module_title']  = $this->_module_title;
+
+        // colorbox
+        $this->template_data['add_css'][] = base_url('www_admin/js/lib/colorbox/colorbox.css');
+        // datatables
+        $this->template_data['add_css'][] = base_url('www_admin/js/lib/datatables/css/datatables_beoro.css');
+
+        // datatables
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/datatables/js/jquery.dataTables.min.js');
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/datatables/js/jquery.dataTables.sorting.js');
+        // datatables bootstrap integration
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/datatables/js/jquery.dataTables.bootstrap.min.js');
+        // colorbox
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/colorbox/jquery.colorbox.min.js');
+
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/pages/beoro_tables.js');
     }
 
     public function index() {

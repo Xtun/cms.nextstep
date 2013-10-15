@@ -75,8 +75,10 @@ class MY_Controller extends CI_Controller {
 class Admin_Controller extends CI_Controller
 {
 
-    protected $scripts       = array();
-    protected $css           = array();
+    protected $scripts     = array();
+    protected $add_scripts = array();
+    protected $css         = array();
+    protected $add_css     = array();
     protected $template_data = array();
 
     public function __construct()
@@ -92,9 +94,19 @@ class Admin_Controller extends CI_Controller
             redirect(base_url('admin/auth'));
         }
 
-        // CSS
-        $this->css[] = base_url('www_admin/css/style.css');
+        /* Common Stylesheets */
 
+        // bootstrap framework css
+        $this->css[] = base_url('plugins/bootstrap/css/bootstrap.min.css');
+        $this->css[] = base_url('plugins/bootstrap/css/bootstrap-responsive.min.css');
+        // iconSweet2 icon pack (16x16)
+        $this->css[] = base_url('www_admin/img/icsw2_16/icsw2_16.css');
+        // splashy icon pack
+        $this->css[] = base_url('www_admin/img/splashy/splashy.css');
+        // flag icons
+        $this->css[] = base_url('www_admin/img/flags/flags.css');
+        // power tooltips
+        $this->css[] = base_url('www_admin/js/lib/powertip/jquery.powertip.css');
 
         /* Common JS */
 
@@ -119,12 +131,16 @@ class Admin_Controller extends CI_Controller
         $this->scripts[] = base_url('www_admin/js/beoro_common.js');
 
         // www_admin data
-        $this->template_data['css']     = $this->css;
-        $this->template_data['scripts'] = $this->scripts;
+        $this->template_data['css']         = $this->css;
+        $this->template_data['add_css']     = $this->add_css;
+        $this->template_data['scripts']     = $this->scripts;
+        $this->template_data['add_scripts'] = $this->add_scripts;
         // modules menu
         $this->template_data['menu'] = $this->config->item('admin_menu');
         // admin variables
         $this->template_data['admin']['copyright_year'] = date('Y', time());
+
+        $this->template_data['user_name'] = $this->session->userdata('rg3user_login');
     }
 
     protected function _get_pages_tree($map_array = array(), $list_tmp = '', $item_tmp = '', $active_id = 0, $params = array()) {

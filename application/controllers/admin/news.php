@@ -1,14 +1,13 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class News extends Admin_Controller {
+
     protected $_module_title;
     protected $_templates;
-    protected $_news_mapper;
     protected $_path_to_image;
 
     public function __construct() {
         parent::__construct();
-        $this->load->library('form_validation');
         $this->_module_title                    = 'новостной блок';
         $this->_templates['index']              = 'news/index';
         $this->_templates['add']                = 'news/add';
@@ -18,9 +17,7 @@ class News extends Admin_Controller {
         $this->_templates['news_edit']          = 'news/news_edit';
         $this->_templates['page_select_list']   = 'page_select_list';
         $this->_templates['page_select_item']   = 'page_select_item';
-        $this->_page_mapper                     = new Page_mapper();
-        $this->_news_mapper                     = new News_mapper();
-        $this->_path_to_image                   = $this->_news_mapper->get_path_to_image();
+        $this->_path_to_image                   = $this->news_mapper->get_path_to_image();
 
         $this->template_data['module_title']  = $this->_module_title;
         $this->template_data['path_to_image'] = $this->_path_to_image;
@@ -28,9 +25,9 @@ class News extends Admin_Controller {
 
     public function index() {
         $parent_id      = !empty($_REQUEST['parent_id']) ? (int)$_REQUEST['parent_id'] : 0;
-        $page_list      = $this->_page_mapper->get_all_pages();
+        $page_list      = $this->page_mapper->get_all_pages();
         $page_select    = $this->_get_pages_tree($page_list, $this->_templates['page_select_list'], $this->_templates['page_select_item'], $parent_id);
-        $list           = $this->_news_mapper->get_categories($parent_id);
+        $list           = $this->news_mapper->get_categories($parent_id);
 
         $this->template_data['page_select'] = $page_select;
         $this->template_data['list']        = $list;
@@ -43,7 +40,7 @@ class News extends Admin_Controller {
         $this->form_validation->set_error_delimiters('', '<br/>');
         $this->form_validation->set_message('required', 'поле "%s" незаполнено');
         $this->form_validation->set_rules('title', '<b>название</b>','trim|required');
-        $page_list          = $this->_page_mapper->get_all_pages();
+        $page_list          = $this->page_mapper->get_all_pages();
         $page_select        = $this->_get_pages_tree($page_list, $this->_templates['page_select_list'], $this->_templates['page_select_item'], (int)$parent_id);
         $object             = new News_category();
         if ($this->form_validation->run()) {
@@ -56,7 +53,7 @@ class News extends Admin_Controller {
             $object->resize_width  = $this->input->post('resize_width');
             $object->resize_height = $this->input->post('resize_height');
 
-            $this->_news_mapper->save($object, 'category');
+            $this->news_mapper->save($object, 'category');
             $parent_id = (int)$parent_id > 0 ? $parent_id = '?parent_id='.(int)$parent_id : '';
             redirect(base_url().'admin/news/'.$parent_id);
         }
@@ -69,7 +66,7 @@ class News extends Admin_Controller {
 
     public function edit($id = 0, $parent_id = 0) {
         if ((int)$id == 0) redirect(base_url().'admin/news/'.$parent_id);
-        $object                   = $this->_news_mapper->get_category($id);
+        $object                   = $this->news_mapper->get_category($id);
         $data = array();
         $data['id']             = $object->id;
         $data['title']          = $object->title;
@@ -78,7 +75,7 @@ class News extends Admin_Controller {
         $data['rss']            = $object->rss;
         $data['resize_width']   = $object->resize_width;
         $data['resize_height']  = $object->resize_height;
-        $page_list              = $this->_page_mapper->get_all_pages();
+        $page_list              = $this->page_mapper->get_all_pages();
         $page_select            = $this->_get_pages_tree($page_list, $this->_templates['page_select_list'], $this->_templates['page_select_item'], $object->parent_id);
         if (!empty($_POST)) {
             $this->form_validation->set_error_delimiters('', '<br/>');
@@ -92,7 +89,7 @@ class News extends Admin_Controller {
                 $object->count_per_page   = $this->input->post('count_per_page');
                 $object->resize_width   = $this->input->post('resize_width');
                 $object->resize_height   = $this->input->post('resize_height');
-                $this->_news_mapper->save($object, 'category');
+                $this->news_mapper->save($object, 'category');
                 redirect(base_url().'admin/news/?page_id='.$parent_id.'#news'.(int)$id);
             }
         }
@@ -105,7 +102,7 @@ class News extends Admin_Controller {
     }
 
     public function copy($id, $parent_id) {
-        $object                   = $this->_news_mapper->get_category($id);
+        $object                   = $this->news_mapper->get_category($id);
         $data = array();
         $data['id']               = $object->id;
         $data['title']            = $object->title;
@@ -123,11 +120,11 @@ class News extends Admin_Controller {
         $object->count_per_page   = $data['count_per_page'];
         $object->resize_width   = $data['resize_width'];
         $object->resize_height   = $data['resize_height'];
-        $this->_news_mapper->save($object, 'category');
+        $this->news_mapper->save($object, 'category');
         $copy_id = $this->db->insert_id();
 
         // копируем новости
-        $news_collection = $this->_news_mapper->get_all_objects($id);
+        $news_collection = $this->news_mapper->get_all_objects($id);
         foreach ($news_collection as $news_copy) {
             $item                   = new News_item();
             $item->parent_id        = $copy_id;
@@ -142,21 +139,21 @@ class News extends Admin_Controller {
             $item->image_id         = $news_copy->image_id;
             $item->inner_image      = $news_copy->inner_image;
             $item->inner_position   = $news_copy->inner_position;
-            $this->_news_mapper->save($item, 'item');
+            $this->news_mapper->save($item, 'item');
         }
         redirect(base_url().'admin/news');
     }
 
 
     public function delete($id, $parent_id) {
-        $this->_news_mapper->delete((int)$id, 'category');
+        $this->news_mapper->delete((int)$id, 'category');
         redirect(base_url().'admin/news/?parent_id='.(int)$parent_id.'#news'.$id);
     }
 
     public function show($parent_id) {
-        $page_list        = $this->_page_mapper->get_all_pages();
+        $page_list        = $this->page_mapper->get_all_pages();
         $page_select    = $this->_get_pages_tree($page_list, $this->_templates['page_select_list'], $this->_templates['page_select_item'], (int)$parent_id);
-        $list            = $this->_news_mapper->get_all_objects((int)$parent_id);
+        $list            = $this->news_mapper->get_all_objects((int)$parent_id);
 
         $this->template_data['page_select'] = $page_select;
         $this->template_data['list']        = $list;
@@ -178,9 +175,9 @@ class News extends Admin_Controller {
         $this->form_validation->set_rules('user_month', '<b>время публикации - месяц</b>','trim|required|is_natural');
         $this->form_validation->set_rules('user_year', '<b>время публикации - год</b>','trim|required|is_natural');
 
-        $category = $this->_news_mapper->get_category($parent_id);
+        $category = $this->news_mapper->get_category($parent_id);
 
-        $page_list          = $this->_page_mapper->get_all_pages();
+        $page_list          = $this->page_mapper->get_all_pages();
         $page_select        = $this->_get_pages_tree($page_list, $this->_templates['page_select_list'], $this->_templates['page_select_item'], (int)$parent_id);
         $item               = new News_item();
         if ($this->form_validation->run() != FALSE) {
@@ -208,7 +205,7 @@ class News extends Admin_Controller {
             $item->image_id       = $small_id;
             $item->inner_image    = $this->input->post('inner_image');
             $item->inner_position = $this->input->post('inner_position');
-            $this->_news_mapper->save($item, 'item');
+            $this->news_mapper->save($item, 'item');
             $parent_id = (int)$parent_id > 0 ? $parent_id = (int)$parent_id : '';
             redirect(base_url().'admin/news/show/'.$parent_id);
         }
@@ -224,7 +221,7 @@ class News extends Admin_Controller {
         $this->scripts[]    = base_url().'js/plugins/ckeditor/ckeditor.js';
         $this->scripts[]    = base_url().'js/plugins/ckeditor/ckfinder.js';
         $this->css[]        = base_url().'js/plugins/ckeditor/sample.css';
-        $item               = $this->_news_mapper->get_object($id);
+        $item               = $this->news_mapper->get_object($id);
         $small_image        = new Image_item($item->image_id);
         $data = array();
         $data['id']             = $item->id;
@@ -244,10 +241,10 @@ class News extends Admin_Controller {
         $data['inner_position'] = $item->inner_position;
         $data['path']           = $this->_path_to_image;
         $data['image']          = $small_image->getFilenameThumb();
-        $page_list              = $this->_page_mapper->get_all_pages();
+        $page_list              = $this->page_mapper->get_all_pages();
         $page_select            = $this->_get_pages_tree($page_list, $this->_templates['page_select_list'], $this->_templates['page_select_item'], $item->parent_id);
 
-        $category = $this->_news_mapper->get_category($parent_id);
+        $category = $this->news_mapper->get_category($parent_id);
 
         if (!empty($_POST)) {
             $this->form_validation->set_error_delimiters('', '<br/>');
@@ -286,7 +283,7 @@ class News extends Admin_Controller {
                 $item->user_min         = $this->input->post('user_min');
                 $item->inner_image      = $this->input->post('inner_image');
                 $item->inner_position   = $this->input->post('inner_position');
-                $this->_news_mapper->save($item, 'item');
+                $this->news_mapper->save($item, 'item');
                 redirect(base_url().'admin/news/show/'.$parent_id.'#news'.(int)$id);
             }
         }
@@ -299,14 +296,14 @@ class News extends Admin_Controller {
     }
 
     public function delete_image($id, $parent_id) {
-        $item = $this->_news_mapper->get_object((int)$id);
+        $item = $this->news_mapper->get_object((int)$id);
         $item->image_id = 0;
-        $this->_news_mapper->save($item, 'item');
+        $this->news_mapper->save($item, 'item');
         redirect(base_url().'admin/news/edit_news/'.(int)$id.'/'.(int)$parent_id);
     }
 
     public function delete_news($id, $parent_id) {
-        $this->_news_mapper->delete((int)$id, 'item');
+        $this->news_mapper->delete((int)$id, 'item');
         redirect(base_url().'admin/news/show/'.(int)$parent_id.'#news'.(int)$id);
     }
 }
