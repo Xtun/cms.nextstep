@@ -21,6 +21,21 @@ class News extends Admin_Controller {
 
         $this->template_data['module_title']  = $this->_module_title;
         $this->template_data['path_to_image'] = $this->_path_to_image;
+
+        // colorbox
+        $this->template_data['add_css'][] = base_url('www_admin/js/lib/colorbox/colorbox.css');
+        // datatables
+        $this->template_data['add_css'][] = base_url('www_admin/js/lib/datatables/css/datatables_beoro.css');
+
+        // datatables
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/datatables/js/jquery.dataTables.min.js');
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/datatables/js/jquery.dataTables.sorting.js');
+        // datatables bootstrap integration
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/datatables/js/jquery.dataTables.bootstrap.min.js');
+        // colorbox
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/colorbox/jquery.colorbox.min.js');
+
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/pages/beoro_tables.js');
     }
 
     public function index() {

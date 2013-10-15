@@ -1,37 +1,67 @@
-<div class="admin_module_title">
-    <h4>
-        <?= !empty($module_title) ? $module_title : ''; ?>
-    </h4>
-</div>
-<div id="content">
-    <div class="banners_module">
-        <form action="<?= base_url('admin/banner'); ?>" method="post">
-            <div class="admin_module_form">родительская страница
-                <select name="parent_id" class="page_select_list">
-                    <option value="0">не выбрано</option>
-                    <?= $page_select; ?>
-                </select>
-                <input type="submit" value="выбрать" class="g-button"/>
+    <!-- main content -->
+    <div class="container">
+        <div class="row-fluid">
+            <div class="span12">
+
+                <div class="w-box">
+                    <div class="w-box-header">
+                        <div class="btn-group">
+                            <!-- <a href="#" class="btn btn-inverse btn-mini delete_rows_dt" data-tableid="dt_banner" title="Edit">Delete</a> -->
+                        </div>
+                    </div>
+                    <div class="w-box-content">
+                        <table class="table table-vam table-striped" id="dt_banner">
+                            <thead>
+                                <tr>
+                                    <th class="table_checkbox" style="width:13px">
+                                        <input type="checkbox" name="select_rows" class="select_rows" data-tableid="dt_banner" />
+                                    </th>
+                                    <th>Название</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <? foreach ( $list as $key => $banner ) : ?>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="row_sel" class="row_sel" />
+                                        </td>
+                                        <td>
+                                            <a href="<?= base_url("admin/banner/show/{$banner->id}/{$parent_id}"); ?>">
+                                                <?= $banner->title; ?>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="<?= base_url("admin/banner/edit/{$banner->id}/{$parent_id}"); ?>" class="btn btn-mini" title="Редактировать">
+                                                    <i class="icon-pencil"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <? endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- confirmation box -->
+                <div class="hide">
+                    <div id="confirm_dialog" class="cbox_content">
+                        <div class="sepH_c">
+                            <strong>Вы уверены, что хотите удалить эти данные?</strong>
+                        </div>
+                        <div>
+                            <a href="#" class="btn btn-small btn-beoro-3 confirm_yes">Удалить</a>
+                            <a href="#" class="btn btn-small confirm_no">Отмена</a>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-        </form>
-        <div class="admin_module_list">
-            <ul class="admin_list">
-                <? if ( ! empty($list) ) : ?>
-                    <? foreach ($list as $banner) :?>
-                        <li id="text<?=$banner->id;?>" onmouseover="$(this).children().children().css('color', '#0099cc')" onmouseout="$(this).children().children().css('color', '#666666')">
-                            <em>
-                                <a href="<?= base_url("admin/banner/show/{$banner->id}/{$parent_id}"); ?>">
-                                    <?= $banner->title; ?>
-                                </a>
-                            </em>
-                            <a href="<?= base_url("admin/banner/edit/{$banner->id}/{$parent_id}"); ?>" class="admin_form_action_page" title="редактировать">
-                                <img title="редактировать" alt="редактировать" src="<?= base_url('www_admin/img/icon_edit_1.5.png'); ?>"/>
-                            </a>
-                            <div class="clear"></div>
-                        </li>
-                    <? endforeach; ?>
-                <? endif; ?>
-            </ul>
         </div>
     </div>
+    <div class="footer_space"></div>
+
 </div>
+<!-- END main wrapper (without footer) -->

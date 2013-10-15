@@ -75,6 +75,12 @@
                                 </ul>
                             </li>
                             <li>
+                                <a href="<?= base_url('admin/banner'); ?>">Виджеты</a>
+                            </li>
+                            <li>
+                                <a href="<?= base_url('admin/settings'); ?>">Настройки сайта</a>
+                            </li>
+                            <li>
                                 <a href="<?= base_url(); ?>" target="_blank">Просмотр сайта</a>
                             </li>
                         </ul>
@@ -120,6 +126,9 @@
                                 <!-- <li><a href="javascript:void(0)" class="ptip_s" title="Comments"><i class="icsw16-speech-bubbles"></i><span class="badge badge-important">14</span></a></li> -->
                                 <!-- <li class="active"><span class="ptip_s" title="Statistics (active)"><i class="icsw16-graph"></i></span></li> -->
                                 <li>
+                                    <a href="<?= base_url('admin/banner'); ?>" class="ptip_s" title="Виджеты"><i class="icsw16-expose"></i></a>
+                                </li>
+                                <li>
                                     <a href="<?= base_url('admin/settings'); ?>" class="ptip_s" title="Настройки сайта"><i class="icsw16-cog"></i></a>
                                 </li>
                             </ul>
@@ -132,7 +141,7 @@
                                     Привет, <strong><?= $user_name; ?></strong>
                                     <ul class="unstyled">
                                         <li>
-                                            <a href="#">Настройки</a>
+                                            <a href="<?= base_url('admin/settings'); ?>">Настройки</a>
                                         </li>
                                         <li>&middot;</li>
                                         <li>

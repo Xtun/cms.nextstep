@@ -4,8 +4,6 @@ class Feedback extends Admin_Controller {
 
     protected $_module_title;
     protected $_templates;
-    protected $_feedback_mapper;
-    protected $_page_mapper;
 
     public function __construct() {
         parent::__construct();
@@ -16,15 +14,28 @@ class Feedback extends Admin_Controller {
         $this->_templates['edit']             = 'feedback/edit';
         $this->_templates['page_select_list'] = 'page_select_list';
         $this->_templates['page_select_item'] = 'page_select_item';
-        $this->_page_mapper                   = new Page_mapper();
-        $this->_feedback_mapper               = new Feedback_mapper();
 
         $this->template_data['module_title']  = $this->_module_title;
+
+        // colorbox
+        $this->template_data['add_css'][] = base_url('www_admin/js/lib/colorbox/colorbox.css');
+        // datatables
+        $this->template_data['add_css'][] = base_url('www_admin/js/lib/datatables/css/datatables_beoro.css');
+
+        // datatables
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/datatables/js/jquery.dataTables.min.js');
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/datatables/js/jquery.dataTables.sorting.js');
+        // datatables bootstrap integration
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/datatables/js/jquery.dataTables.bootstrap.min.js');
+        // colorbox
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/colorbox/jquery.colorbox.min.js');
+
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/pages/beoro_tables.js');
     }
 
     public function index ()
     {
-        $ff_list = $this->_feedback_mapper->get_ff_list();
+        $ff_list = $this->feedback_mapper->get_ff_list();
 
         $this->template_data['ff_list'] = $ff_list;
 
@@ -33,7 +44,7 @@ class Feedback extends Admin_Controller {
 
     public function history ()
     {
-        $history = $this->_feedback_mapper->get_history();
+        $history = $this->feedback_mapper->get_history();
 
         $this->template_data['history'] = $history;
 
@@ -42,7 +53,7 @@ class Feedback extends Admin_Controller {
 
     public function add ( $parent_id = 0 )
     {
-        $page_list   = $this->_page_mapper->get_all_pages();
+        $page_list   = $this->page_mapper->get_all_pages();
         $page_select = $this->_get_pages_tree($page_list, $this->_templates['page_select_list'], $this->_templates['page_select_item'], $parent_id);
 
         if ( ! empty($_POST) )
@@ -66,7 +77,7 @@ class Feedback extends Admin_Controller {
                 $form->email_to      = $this->input->post('email_to');
                 $form->email_from    = $this->input->post('email_from');
                 $form->email_name    = $this->input->post('email_name');
-                $form_id = $this->_feedback_mapper->save($form);
+                $form_id = $this->feedback_mapper->save($form);
 
                 $ff_title    = $this->input->post('ff_title');
                 $ff_type     = $this->input->post('ff_type');
@@ -77,9 +88,9 @@ class Feedback extends Admin_Controller {
                     $selector_index = $this->input->post('selector_index');
                     if ( !empty($selector_val) && !empty($selector_index) && ( count($selector_index) == count($selector_val) ) )
                     {
-                        $this->_feedback_mapper->ff_fields_add($form_id, $ff_title, $ff_type, $ff_required, $selector_index, $selector_val);
+                        $this->feedback_mapper->ff_fields_add($form_id, $ff_title, $ff_type, $ff_required, $selector_index, $selector_val);
                     } else {
-                        $this->_feedback_mapper->ff_fields_add($form_id, $ff_title, $ff_type, $ff_required);
+                        $this->feedback_mapper->ff_fields_add($form_id, $ff_title, $ff_type, $ff_required);
                     }
                 }
                 redirect(base_url('admin/feedback'));
@@ -98,12 +109,12 @@ class Feedback extends Admin_Controller {
         {
             redirect(base_url('admin/feedback'));
         }
-        $form = $this->_feedback_mapper->get_ff_object($id, TRUE);
+        $form = $this->feedback_mapper->get_ff_object($id, TRUE);
 
-        $page_list   = $this->_page_mapper->get_all_pages();
+        $page_list   = $this->page_mapper->get_all_pages();
         $page_select = $this->_get_pages_tree($page_list, $this->_templates['page_select_list'], $this->_templates['page_select_item'], $form->parent_id);
 
-        $ff_fields_list = $this->_feedback_mapper->ff_fields_get($form->id);
+        $ff_fields_list = $this->feedback_mapper->ff_fields_get($form->id);
 
         if ( ! empty($_POST) )
         {
@@ -125,22 +136,22 @@ class Feedback extends Admin_Controller {
                 $form->email_to      = $this->input->post('email_to');
                 $form->email_from    = $this->input->post('email_from');
                 $form->email_name    = $this->input->post('email_name');
-                $this->_feedback_mapper->save($form);
+                $this->feedback_mapper->save($form);
 
                 $ff_title    = $this->input->post('ff_title');
                 $ff_type     = $this->input->post('ff_type');
                 $ff_required = $this->input->post('ff_required');
                 if ( !empty($ff_type) && !empty($ff_title) )
                 {
-                    $this->_feedback_mapper->ff_fields_clear($form->id);
+                    $this->feedback_mapper->ff_fields_clear($form->id);
 
                     $selector_val   = $this->input->post('selector_val');
                     $selector_index = $this->input->post('selector_index');
                     if ( !empty($selector_val) && !empty($selector_index) && ( count($selector_index) == count($selector_val) ) )
                     {
-                        $this->_feedback_mapper->ff_fields_add($form->id, $ff_title, $ff_type, $ff_required, $selector_index, $selector_val);
+                        $this->feedback_mapper->ff_fields_add($form->id, $ff_title, $ff_type, $ff_required, $selector_index, $selector_val);
                     } else {
-                        $this->_feedback_mapper->ff_fields_add($form->id, $ff_title, $ff_type, $ff_required);
+                        $this->feedback_mapper->ff_fields_add($form->id, $ff_title, $ff_type, $ff_required);
                     }
                 }
 
@@ -158,7 +169,7 @@ class Feedback extends Admin_Controller {
 
     public function delete ( $id = 0 )
     {
-        $this->_feedback_mapper->delete($id);
+        $this->feedback_mapper->delete($id);
         redirect(base_url('admin/feedback'));
     }
 

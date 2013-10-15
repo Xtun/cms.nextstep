@@ -13,6 +13,18 @@ class Settings extends Admin_Controller {
         $this->_templates['index'] = 'settings/index';
 
         $this->template_data['module_title'] = $this->_module_title;
+
+        // switch buttons
+        $this->template_data['add_css'][] = base_url('www_admin/js/lib/ibutton/css/jquery.ibutton.css');
+        // enchanced select box, tag handler
+        $this->template_data['add_css'][] = base_url('www_admin/js/lib/select2/select2.css');
+
+        // switch buttons
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/ibutton/js/jquery.ibutton.beoro.min.js');
+        // enchanced select box, tag handler
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/lib/select2/select2.min.js');
+
+        $this->template_data['add_scripts'][] = base_url('www_admin/js/pages/beoro_settings.js');
     }
 
     public function index()

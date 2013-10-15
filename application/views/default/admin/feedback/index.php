@@ -1,49 +1,72 @@
-<div class="admin_module_title">
-    <h4>
-        <?= !empty($module_title) ? $module_title : '' ; ?>
-    </h4>
-</div>
+    <!-- main content -->
+    <div class="container">
+        <div class="row-fluid">
+            <div class="span12">
 
-<div id="content">
-    <ul class="module_menu">
-        <li>
-            <a href="<?= base_url('admin/feedback/add'); ?>">
-                <button class="styler">создать форму</button>
-            </a>
-        </li>
-        <li>
-            <a href="<?= base_url('admin/feedback/history'); ?>">
-                <button class="styler">история</button>
-            </a>
-        </li>
-    </ul>
-    <ul class="admin_list admin_mainlist">
-        <h6>Список форм обратной связи:</h6>
-        <? foreach ( $ff_list as $form ) : ?>
-            <li>
-                <div class="menuline clearfix">
-                    <span class="left">
-                        <a href="<?= base_url('admin/feedback/edit/'.$form->id); ?>" title="редактировать">
-                            <?= $form->title; ?>
-                        </a>
-                    </span>
-                    <span class="right">
-                        <a href="<?= base_url('admin/feedback/delete/'.$form->id); ?>" class="admin_form_action_page" onclick="if (confirm('Вы уверены?')) return true; else return false;" title="удалить">
-                            <img title="удалить" alt="удалить" src="/www_admin/img/icon_delete_1.5.png" />
-                        </a>
-                    </span>
-                    <span class="right">
-                        <a href="<?= base_url('admin/feedback/edit/'.$form->id); ?>" class="admin_form_action_page" title="редактировать">
-                            <img title="редактировать" alt="редактировать" src="/www_admin/img/icon_edit_1.5.png"/>
-                        </a>
-                    </span>
+                <div class="w-box">
+                    <div class="w-box-header">
+                        <div class="btn-group">
+                            <!-- <a href="#" class="btn btn-inverse btn-mini delete_rows_dt" data-tableid="dt_feedback" title="Edit">Delete</a> -->
+                            <a href="<?= base_url('admin/feedback/add'); ?>" class="btn btn-inverse btn-mini" title="Добавить">Добавить</a>
+                            <a href="<?= base_url('admin/feedback/history'); ?>" class="btn btn-inverse btn-mini" title="История">История</a>
+                        </div>
+                    </div>
+                    <div class="w-box-content">
+                        <table class="table table-vam table-striped" id="dt_feedback">
+                            <thead>
+                                <tr>
+                                    <th class="table_checkbox" style="width:13px">
+                                        <input type="checkbox" name="select_rows" class="select_rows" data-tableid="dt_feedback" />
+                                    </th>
+                                    <th>Название</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <? foreach ( $ff_list as $key => $form ) : ?>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="row_sel" class="row_sel" />
+                                        </td>
+                                        <td>
+                                            <a href="<?= base_url("admin/feedback/edit/{$form->id}"); ?>">
+                                                <?= $form->title; ?>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="<?= base_url("admin/feedback/edit/{$form->id}"); ?>" class="btn btn-mini" title="Редактировать">
+                                                    <i class="icon-pencil"></i>
+                                                </a>
+                                                <a href="<?= base_url("admin/feedback/delete/{$form->id}"); ?>" class="btn btn-mini delete_single_row" title="Удалить">
+                                                    <i class="icon-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <? endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </li>
-        <? endforeach; ?>
-    </ul>
-    <ul class="module_menu">
-        <li>
-            <a href="#to_top">наверх</a>
-        </li>
-    </ul>
+
+                <!-- confirmation box -->
+                <div class="hide">
+                    <div id="confirm_dialog" class="cbox_content">
+                        <div class="sepH_c">
+                            <strong>Вы уверены, что хотите удалить эти данные?</strong>
+                        </div>
+                        <div>
+                            <a href="#" class="btn btn-small btn-beoro-3 confirm_yes">Удалить</a>
+                            <a href="#" class="btn btn-small confirm_no">Отмена</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="footer_space"></div>
+
 </div>
+<!-- END main wrapper (without footer) -->

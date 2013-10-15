@@ -2,7 +2,11 @@
 
     $(document).ready(function() {
         //* datatable must be rendered first
-        beoro_galery_table.init();
+        text_table.init();
+        news_table.init();
+        gallery_table.init();
+        feedback_table.init();
+        banner_table.init();
         //* actions for tables, datatables
         beoro_select_row.init();
         beoro_delete_rows.simple();
@@ -120,11 +124,91 @@
         }
     };
 
-    //* gallery table view
-    beoro_galery_table = {
+    // text table view
+    text_table = {
         init: function() {
             if($('#dt_text').length) {
                 $('#dt_text').dataTable({
+                    "oLanguage": {
+                        "sUrl": "/www_admin/js/lib/datatables/i18n/ru.txt"
+                    },
+                    "sPaginationType": "bootstrap",
+                    "aaSorting": [[ 2, "asc" ]],
+                    "aoColumns": [
+                        { "bSortable": false },
+                        { "sType": "string" },
+                        { "bSortable": false }
+                    ]
+                });
+            }
+        }
+    };
+
+    // news table view
+    news_table = {
+        init: function() {
+            if($('#dt_news').length) {
+                $('#dt_news').dataTable({
+                    "oLanguage": {
+                        "sUrl": "/www_admin/js/lib/datatables/i18n/ru.txt"
+                    },
+                    "sPaginationType": "bootstrap",
+                    "aaSorting": [[ 2, "asc" ]],
+                    "aoColumns": [
+                        { "bSortable": false },
+                        { "sType": "string" },
+                        { "bSortable": false }
+                    ]
+                });
+            }
+        }
+    };
+
+    // gallery table view
+    gallery_table = {
+        init: function() {
+            if($('#dt_gallery').length) {
+                $('#dt_gallery').dataTable({
+                    "oLanguage": {
+                        "sUrl": "/www_admin/js/lib/datatables/i18n/ru.txt"
+                    },
+                    "sPaginationType": "bootstrap",
+                    "aaSorting": [[ 2, "asc" ]],
+                    "aoColumns": [
+                        { "bSortable": false },
+                        { "sType": "string" },
+                        { "bSortable": false }
+                    ]
+                });
+            }
+        }
+    };
+
+    // feedback table view
+    feedback_table = {
+        init: function() {
+            if($('#dt_feedback').length) {
+                $('#dt_feedback').dataTable({
+                    "oLanguage": {
+                        "sUrl": "/www_admin/js/lib/datatables/i18n/ru.txt"
+                    },
+                    "sPaginationType": "bootstrap",
+                    "aaSorting": [[ 2, "asc" ]],
+                    "aoColumns": [
+                        { "bSortable": false },
+                        { "sType": "string" },
+                        { "bSortable": false }
+                    ]
+                });
+            }
+        }
+    };
+
+    // banner table view
+    banner_table = {
+        init: function() {
+            if($('#dt_banner').length) {
+                $('#dt_banner').dataTable({
                     "oLanguage": {
                         "sUrl": "/www_admin/js/lib/datatables/i18n/ru.txt"
                     },
