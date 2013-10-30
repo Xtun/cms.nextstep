@@ -43,8 +43,6 @@ class Text extends Admin_Controller {
             $new_text->title            = $this->input->post('title');
             $new_text->show_title       = $this->input->post('show_title') == 'on' ? 1 : 0;
             $new_text->description      = $this->input->post('description');
-            $new_text->description      = str_replace('<div>', '<p>', $new_text->description);
-            $new_text->description      = str_replace('</div>', '</p>', $new_text->description);
             $new_id = $this->text_mapper->save($new_text);
             $parent_id = (int)$parent_id > 0 ? $parent_id = '?parent_id='.(int)$parent_id : '';
             redirect(base_url().'admin/text/'.$parent_id);
@@ -76,8 +74,6 @@ class Text extends Admin_Controller {
                 $edit_text->title       = $this->input->post('title');
                 $edit_text->show_title  = $this->input->post('show_title') == 'on' ? 1 : 0;
                 $edit_text->description = $this->input->post('description');
-                $edit_text->description = str_replace('<div>', '<p>', $edit_text->description);
-                $edit_text->description = str_replace('</div>', '</p>', $edit_text->description);
                 $this->text_mapper->save($edit_text);
                 redirect(base_url().'admin/text/?page_id='.$parent_id.'#textblock'.(int)$id);
             }
